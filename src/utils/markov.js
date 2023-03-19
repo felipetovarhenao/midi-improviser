@@ -29,14 +29,14 @@ export default class MarkovModel {
       const state = JSON.stringify(sequence.slice(i, i + this.order));
 
       /* intialize transition row */
-      if (!this.transitionTable[state]) {
+      if (this.transitionTable[state] === undefined) {
         this.transitionTable[state] = {};
         this.stateWeights[state] = 0;
         this.numStates++;
       }
 
       if (prevState) {
-        if (!this.transitionTable[prevState][state]) {
+        if (this.transitionTable[prevState][state] === undefined) {
           this.transitionTable[prevState][state] = 1;
         } else {
           this.transitionTable[prevState][state]++;

@@ -116,7 +116,6 @@ export default class Improviser {
 
   async parse(files) {
     const sequence = [];
-    console.log(files);
     for (let i = 0; i < files.length; i++) {
       const url = URL.createObjectURL(files[i]);
       const midi = await Midi.fromUrl(url);
