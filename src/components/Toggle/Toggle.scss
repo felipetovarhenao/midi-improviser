@@ -1,0 +1,13 @@
+@import "../../styles/styles.scss";
+
+.Toggle {
+  @include pad;
+  @include round;
+  @include mar;
+  cursor: pointer;
+  background-color: var(--bg1);
+  &.selected {
+    background-color: var(--secondary);
+    color: var(--neg-txt);
+  }
+}

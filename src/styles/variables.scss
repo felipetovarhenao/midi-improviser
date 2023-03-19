@@ -1,0 +1,52 @@
+$font1: "Inter", "Arial", sans-serif;
+
+:root {
+  --bg1: #f6f6f6;
+  --bg2: #ececec;
+  --bg3: #d8d7d7;
+  --bord: #959595;
+  --txt: #292929;
+  --neg-txt: var(--bg1);
+  --primary: #095082;
+  --secondary: #3575a4;
+  --danger: #aa432f;
+  --success: #4c9971;
+  --danger-hl: #d0573f;
+  --bg-hl: #ffffff;
+  --bg-sel: #d8d8d8;
+  --inactive: #949494;
+  --inactive-txt: var(--bg2);
+  --border: #949494;
+  --glow: #fff4a377;
+  --wkey: #f3f3f3;
+  --bkey: #c2c2c2;
+  --pkey: var(--secondary);
+  --pkeyb: var(--primary);
+  --key-hl: #95bad1;
+  --txt2: #757575;
+}
+
+/* sizes */
+$gap-xs: 1px;
+$gap-sm: 2.5px;
+$gap-md: 5px;
+$gap-lg: 10px;
+$gap-xl: 15px;
+
+$txt-xs: 9.5px;
+$txt-sm: 11px;
+$txt-ms: 12.5px;
+$txt-md: 14px;
+$txt-lg: 18px;
+$txt-ml: 24px;
+$txt-xl: 30px;
+$txt-xxl: 36px;
+
+$border-sm: 1px;
+$border-md: 1.5px;
+$border-lg: 3px;
+
+$radius-sm: 2.5px;
+$radius-md: 5px;
+
+$grow: 1.025;

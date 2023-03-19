@@ -1,0 +1,36 @@
+@import "../../styles/styles.scss";
+
+.FileUploader {
+  @include v-pad($gap-xl);
+  @include r-pad($gap-lg);
+  input[type="file"] {
+    display: none;
+  }
+
+  .file-menu {
+    @include round;
+    height: 300px;
+    overflow: auto;
+    background-color: var(--bg2);
+  }
+  .buttons {
+    @include h-stack-c;
+    width: 100%;
+    justify-content: space-between;
+    label {
+      @include btn;
+      text-align: center;
+    }
+    button,
+    label {
+      font-size: $txt-ms;
+      font-weight: bold;
+      width: 100%;
+      @include mar;
+    }
+  }
+  .description {
+    @include v-mar;
+    color: var(--txt2);
+  }
+}

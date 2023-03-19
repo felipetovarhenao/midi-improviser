@@ -1,0 +1,23 @@
+@import "./styles/styles.scss";
+.App {
+  @include pad($gap-lg);
+  width: 50vw;
+  @include v-stack;
+  @include h-center;
+  min-height: 100vh;
+  .modules {
+    @include v-pad($gap-lg);
+    @include col-grid(1fr 1fr);
+  }
+  .footer {
+    @include to-bottom;
+    @include h-center;
+    @include v-pad;
+    a {
+      color: var(--primary);
+      &:hover {
+        color: var(--secondary);
+      }
+    }
+  }
+}

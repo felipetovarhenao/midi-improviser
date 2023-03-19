@@ -1,0 +1,278 @@
+@import "./variables.scss";
+
+@mixin stack {
+  display: flex;
+}
+
+@mixin v-stack {
+  @include stack;
+  flex-direction: column;
+}
+
+@mixin h-stack {
+  @include stack;
+  flex-direction: row;
+}
+
+@mixin v-center {
+  @include stack;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+@mixin h-center {
+  @include stack;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@mixin center {
+  @include stack;
+  @include h-center;
+  @include v-center;
+}
+
+@mixin h-stack-c {
+  @include h-stack;
+  @include v-center;
+  align-items: center;
+}
+
+@mixin v-stack-c {
+  @include v-stack;
+  @include h-center;
+  justify-content: center;
+}
+
+@mixin to-right {
+  @include stack;
+  margin-left: auto;
+}
+
+@mixin to-left {
+  @include stack;
+  margin-right: auto;
+}
+
+@mixin to-top {
+  @include stack;
+  margin-bottom: auto;
+}
+
+@mixin to-bottom {
+  @include stack;
+  margin-top: auto;
+}
+@mixin wrap {
+  flex-wrap: wrap;
+}
+
+@mixin l-pad($gap: $gap-md) {
+  padding-left: $gap;
+}
+
+@mixin r-pad($gap: $gap-md) {
+  padding-right: $gap;
+}
+
+@mixin t-pad($gap: $gap-md) {
+  padding-top: $gap;
+}
+
+@mixin b-pad($gap: $gap-md) {
+  padding-bottom: $gap;
+}
+
+@mixin h-pad($gap: $gap-md) {
+  @include l-pad($gap);
+  @include r-pad($gap);
+}
+
+@mixin v-pad($gap: $gap-md) {
+  @include t-pad($gap);
+  @include b-pad($gap);
+}
+
+@mixin pad($gap: $gap-md) {
+  padding: $gap;
+}
+
+@mixin h-pad($gap: $gap-md) {
+  @include l-pad($gap);
+  @include r-pad($gap);
+}
+
+@mixin v-pad($gap: $gap-md) {
+  @include t-pad($gap);
+  @include b-pad($gap);
+}
+
+@mixin vh-pad($v-gap: $gap-md, $h-gap: $gap-md) {
+  @include v-pad($v-gap);
+  @include h-pad($h-gap);
+}
+
+@mixin l-mar($gap: $gap-md) {
+  margin-left: $gap;
+}
+
+@mixin r-mar($gap: $gap-md) {
+  margin-right: $gap;
+}
+
+@mixin t-mar($gap: $gap-md) {
+  margin-top: $gap;
+}
+
+@mixin b-mar($gap: $gap-md) {
+  margin-bottom: $gap;
+}
+
+@mixin h-mar($gap: $gap-md) {
+  @include l-mar($gap);
+  @include r-mar($gap);
+}
+
+@mixin v-mar($gap: $gap-md) {
+  @include t-mar($gap);
+  @include b-mar($gap);
+}
+
+@mixin mar($gap: $gap-md) {
+  margin: $gap;
+}
+
+@mixin vh-mar($v-gap: $gap-md, $h-gap: $gap-md) {
+  @include l-mar($h-gap);
+  @include r-mar($h-gap);
+  @include t-mar($v-gap);
+  @include b-mar($v-gap);
+}
+
+@mixin col-grid($sizes...) {
+  display: grid;
+  grid-template-columns: $sizes;
+}
+
+@mixin row-grid($sizes...) {
+  display: grid;
+  grid-template-rows: $sizes;
+}
+
+@mixin trans($time: 0.25s) {
+  transition: $time ease-in-out;
+  &:hover {
+    transition: $time ease-in-out;
+  }
+}
+
+@mixin clickable {
+  @include trans;
+  &:not([disabled]) {
+    cursor: pointer;
+  }
+}
+
+@mixin link-color {
+  &,
+  * {
+    @include trans;
+    color: var(--link);
+  }
+  &:hover,
+  &:hover * {
+    @include trans;
+    color: var(--link-hover);
+  }
+}
+@mixin link {
+  @include link-color;
+  @include clickable;
+}
+
+@mixin border($color: var(--border), $size: $border-md) {
+  border: $size solid $color;
+}
+
+@mixin round($size: $radius-md) {
+  border-radius: $size;
+}
+
+@mixin round-border($args...) {
+  @include border($args...);
+  @include round;
+}
+
+@mixin btn {
+  @include clickable;
+  @include round;
+  @include vh-pad($gap-md, $gap-lg);
+  @include v-mar($gap-sm);
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+  font-weight: bold;
+  font-size: $txt-ms;
+  background-color: var(--primary);
+  text-transform: uppercase;
+  &,
+  & * {
+    color: var(--neg-txt);
+  }
+  &:disabled {
+    color: var(--inactive-txt);
+    background-color: var(--inactive);
+  }
+  &:not([disabled]):hover {
+    background-color: var(--secondary);
+    &,
+    & * {
+      color: var(--neg-txt);
+    }
+  }
+}
+
+@mixin btn-primary {
+  @include btn;
+  @include t-mar($gap-lg);
+  &:not([disabled]) {
+    color: var(--primary);
+    &:hover {
+      outline: $border-md solid var(--border);
+    }
+  }
+}
+
+@mixin grow {
+  &:hover {
+    scale: $grow;
+  }
+}
+
+@mixin card {
+  @include btn;
+  &:hover {
+    @include grow;
+  }
+}
+
+@mixin crop-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin container {
+  @include round-border;
+  @include pad($gap-lg);
+  background-color: var(--bg2);
+}
+
+@mixin indent($size: 1) {
+  @include l-mar(calc($gap-lg * $size));
+}
+
+@mixin onload-animation($name, $dur: 1s) {
+  -webkit-animation: $name $dur ease-in-out 0s 1 normal forwards;
+  animation: $name $dur ease-in-out 0s 1 normal forwards;
+}
