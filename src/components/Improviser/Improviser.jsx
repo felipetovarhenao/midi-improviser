@@ -16,8 +16,10 @@ export default function Improviser() {
   const [keyMode, setKeyMode] = useState("major");
 
   async function train() {
-    if (improviser.getMemory() !== markovOrder) {
-      improviser.setMemory(markovOrder);
+    /* convert String to Number */
+    const memory = Number(markovOrder);
+    if (improviser.getMemory() !== memory) {
+      improviser.setMemory(memory);
     }
     setIsTrained(false);
     setStatus(`training improviser (memory size: ${markovOrder})...`);
@@ -30,7 +32,7 @@ export default function Improviser() {
   async function generate() {
     setDownloadURL(false);
     setStatus("generating MIDI...");
-    const bufferArray = await improviser.generate(numNotes, tempo, keySignature, keyMode);
+    const bufferArray = await improviser.generate(Number(numNotes), Number(tempo), keySignature, keyMode);
     const blob = new Blob([bufferArray], { type: "audio/midi" });
     const url = URL.createObjectURL(blob);
     setTimeout(() => {

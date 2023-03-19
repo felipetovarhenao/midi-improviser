@@ -25,7 +25,7 @@ export default class MarkovModel {
     let prevState = null;
 
     for (let i = 0; i < numFrames; i++) {
-      /* create stringified frame */
+      /* create stringified state */
       const state = JSON.stringify(sequence.slice(i, i + this.order));
 
       /* intialize transition row */
