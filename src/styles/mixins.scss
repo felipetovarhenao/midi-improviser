@@ -219,15 +219,22 @@
   & * {
     color: var(--neg-txt);
   }
-  &:disabled {
-    color: var(--inactive-txt);
-    background-color: var(--inactive);
-  }
-  &:not([disabled]):hover {
+  &:hover {
     background-color: var(--secondary);
+  }
+  &.danger {
+    background-color: var(--danger);
+    &:hover {
+      background-color: var(--danger-hl);
+    }
+  }
+  &[disabled],
+  &.disabled {
     &,
-    & * {
-      color: var(--neg-txt);
+    &:hover {
+      pointer-events: none;
+      background-color: var(--inactive);
+      color: var(--inactive-txt);
     }
   }
 }

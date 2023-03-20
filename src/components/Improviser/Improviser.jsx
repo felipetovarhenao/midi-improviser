@@ -2,10 +2,12 @@ import { useContext, useEffect, useState } from "react";
 import { ImproviserContext } from "./ImproviserProvider";
 import { FileUploaderContext } from "../FileUploader/FileUploaderProvider";
 import "./Improviser.scss";
+import classNames from "classnames";
 
 export default function Improviser() {
   const { improviser } = useContext(ImproviserContext);
-  const { selectedFiles } = useContext(FileUploaderContext);
+  const { files } = useContext(FileUploaderContext);
+  const [selectedFiles, setSelectedFiles] = useState([]);
   const [downloadURL, setDownloadURL] = useState(false);
   const [isTrained, setIsTrained] = useState(false);
   const [numNotes, setNumNotes] = useState(500);
@@ -50,10 +52,17 @@ export default function Improviser() {
     if (dd < 10) dd = "0" + dd;
     if (mm < 10) mm = "0" + mm;
 
-    const formattedToday = dd + "-" + mm + "-" + yyyy;
+    const date = dd + "-" + mm + "-" + yyyy;
+    const mem = improviser.markov.order;
 
-    return `MIDI improviser output (${numNotes} notes in ${keySignature}${keyMode === "major" ? "M" : "m"} @ ${tempo}BPM on ${formattedToday}).mid`;
+    return `improv (${numNotes} notes in ${keySignature}${keyMode === "major" ? "M" : "m"} @ ${tempo}BPM with memory size of ${mem} on ${date}).mid`;
   }
+
+  useEffect(() => {
+    const sel = [];
+    Object.keys(files).forEach((name) => files[name].selected && sel.push(files[name].file));
+    setSelectedFiles(sel);
+  }, [files]);
 
   return (
     <div className="Improviser">
@@ -117,14 +126,20 @@ export default function Improviser() {
             <button onClick={generate} disabled={!isTrained}>
               Generate
             </button>
-            <button disabled={!downloadURL}>
-              {downloadURL ? (
-                <a href={downloadURL} download={makeFileName()} onClick={() => setDownloadURL(false) || setStatus(false)}>
-                  Download
-                </a>
-              ) : (
-                "Download"
-              )}
+            <button
+              className={classNames({ disabled: !downloadURL })}
+              onClick={() => {
+                const link = document.createElement("a");
+                link.href = downloadURL;
+                link.download = makeFileName();
+                link.click();
+                setStatus("downloading...");
+                setTimeout(() => {
+                  setStatus(false);
+                }, 2000);
+              }}
+            >
+              Download
             </button>
           </div>
         </form>

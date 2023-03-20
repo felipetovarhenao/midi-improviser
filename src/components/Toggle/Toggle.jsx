@@ -2,18 +2,9 @@ import classNames from "classnames";
 import { useEffect, useState } from "react";
 import "./Toggle.scss";
 
-export default function Toggle({ text, className, reset, onSelect, ...rest }) {
-  const [selected, setSelected] = useState(false);
-  useEffect(() => {
-    onSelect(selected);
-  }, [selected]);
-
-  useEffect(() => {
-    setSelected(false);
-  }, [reset]);
-
+export default function Toggle({ text, isSelected, className, onClick, ...rest }) {
   return (
-    <div onClick={() => setSelected((x) => !x)} className={classNames(className, "Toggle", { selected: selected })} {...rest}>
+    <div onClick={onClick} className={classNames(className, "Toggle", { selected: isSelected })} {...rest}>
       {text}
     </div>
   );

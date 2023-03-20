@@ -34,16 +34,11 @@ a {
 }
 button {
   @include btn;
-  &.danger:not([disabled]) {
-    background-color: var(--danger);
-    &:hover {
-      background-color: var(--danger-hl);
-    }
-  }
 }
 input,
 textarea,
 select {
+  @include round;
   background-color: var(--bg3);
   color: var(--txt);
 }

@@ -1,7 +1,7 @@
 @import "./styles/styles.scss";
 .App {
   @include pad($gap-lg);
-  width: 50vw;
+  width: 60vw;
   @include v-stack;
   @include h-center;
   min-height: 100vh;

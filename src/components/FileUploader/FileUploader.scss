@@ -8,8 +8,9 @@
   }
 
   .file-menu {
+    @include v-stack;
     @include round;
-    height: 300px;
+    height: 312px;
     overflow: auto;
     background-color: var(--bg2);
   }
@@ -17,16 +18,15 @@
     @include h-stack-c;
     width: 100%;
     justify-content: space-between;
-    label {
-      @include btn;
-      text-align: center;
-    }
     button,
     label {
+      @include btn;
+      @include mar;
+      text-align: center;
       font-size: $txt-ms;
       font-weight: bold;
       width: 100%;
-      @include mar;
+      height: 100%;
     }
   }
   .description {

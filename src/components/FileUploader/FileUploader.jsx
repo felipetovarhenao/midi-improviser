@@ -1,51 +1,55 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FileUploaderContext } from "./FileUploaderProvider";
-import classNames from "classnames";
 import Toggle from "../Toggle/Toggle";
 import "./FileUploader.scss";
 
-function includesFile(files, file) {
-  /* filter out existing files */
-  for (let i = 0; i < files.length; i++) {
-    if (files[i].name === file.name) {
-      return true;
-    }
-  }
-  return false;
-}
-
 export default function FileUploader() {
-  const { files, setFiles, selectedFiles, setSelectedFiles } = useContext(FileUploaderContext);
-  const [resetToggles, setResetToggles] = useState(false);
+  const { files, setFiles } = useContext(FileUploaderContext);
+  const [numSelected, setNumSelected] = useState(0);
 
   function appendFiles() {
-    const midiFiles = document.getElementById("midi").files;
-    if (!midiFiles) {
+    const midiFiles = Array.from(document.getElementById("midi").files);
+    if (!midiFiles.length) {
       return;
     }
-
-    /* only add files that haven't been uploaded */
-    const newFiles = Array.from(midiFiles).filter((x) => !includesFile(files, x));
-    setFiles((prev) => [...prev, ...newFiles].sort((a, b) => a.name - b.name));
-
-    document.getElementById("midi").value = "";
+    const newFiles = {};
+    midiFiles.forEach((file) => {
+      if (files[file.name] === undefined) {
+        newFiles[file.name] = { file: file, selected: false };
+      }
+    });
+    setFiles((prev) => ({ ...prev, ...newFiles }));
   }
 
-  function handleFileSelection(selected, file) {
-    if (selected) {
-      setSelectedFiles((prev) => [...prev, file]);
-    } else {
-      const update = [...selectedFiles];
-      update.pop(file);
-      setSelectedFiles(update);
-    }
+  useEffect(() => {
+    const selected = Object.keys(files).filter((name) => files[name].selected);
+    setNumSelected(selected.length);
+  }, [files]);
+
+  function onToggleClick(fileName) {
+    setFiles((prev) => ({
+      ...prev,
+      [fileName]: {
+        ...prev[fileName],
+        selected: !prev[fileName].selected,
+      },
+    }));
+  }
+
+  function setAllToggles(state) {
+    const newFiles = {};
+    Object.keys(files).forEach((name) => (newFiles[name] = { ...files[name], selected: state }));
+    setFiles(newFiles);
   }
 
   function deleteSelected() {
-    const update = [...files];
-    setFiles(update.filter((file) => !includesFile(selectedFiles, file)));
-    setResetToggles((x) => !x);
-    setSelectedFiles([]);
+    const newFiles = {};
+    Object.keys(files).forEach((name) => {
+      if (!files[name].selected) {
+        newFiles[name] = files[name];
+      }
+    });
+    setFiles(newFiles);
   }
 
   return (
@@ -54,25 +58,32 @@ export default function FileUploader() {
         <h2>File menu</h2>
         <p className="description">Upload MIDI files, and select the ones you want to use to train the improviser.</p>
         <div className="file-menu">
-          {Array.from(files).map((file, i) => {
-            return (
-              <Toggle
-                key={i}
-                text={file.name}
-                reset={resetToggles}
-                onSelect={(selected) => handleFileSelection(selected, file)}
-                className="fileToggle"
-              />
-            );
-          })}
+          {Object.keys(files)
+            .sort()
+            .map((fileName, i) => {
+              return (
+                <Toggle
+                  key={i}
+                  text={fileName}
+                  isSelected={files[fileName].selected}
+                  onClick={() => onToggleClick(fileName)}
+                  className="fileToggle"
+                />
+              );
+            })}
         </div>
         <div className="buttons">
           <label htmlFor="midi">Add files</label>
           <input type="file" id="midi" accept=".mid, .midi, audio/midi" onChange={appendFiles} multiple />
-          <button className="danger" onClick={deleteSelected} disabled={!selectedFiles.length}>
-            Remove files
+          <button onClick={() => setAllToggles(true)}>Select all</button>
+          <button onClick={() => setAllToggles(false)} disabled={!numSelected}>
+            Clear
+          </button>
+          <button className="danger" onClick={deleteSelected} disabled={!numSelected}>
+            Remove
           </button>
         </div>
+        <div>{numSelected > 0 && `${numSelected} file(s) selected`}</div>
       </div>
     </div>
   );

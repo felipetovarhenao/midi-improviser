@@ -10,6 +10,9 @@
         @include pad;
         @include v-mar;
       }
+      label {
+        @include v-mar;
+      }
     }
   }
   .buttons {
@@ -19,9 +22,14 @@
     button {
       width: 100%;
       @include mar;
-      a {
-        font-size: $txt-ms;
-        font-weight: bold;
+    }
+    a {
+      @include btn;
+      width: 100%;
+      text-align: center;
+      &.disabled:hover {
+        background-color: var(--inactive);
+        cursor: default;
       }
     }
   }
