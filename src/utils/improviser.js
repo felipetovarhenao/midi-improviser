@@ -29,8 +29,7 @@ export default class Improviser {
   constructor(memory = 2) {
     this.markov = new MarkovModel(memory);
     this.PPQ = 480;
-    this.maxSubdivisions = [16, 24];
-    this.quantumUnit = this.PPQ * 4;
+    this.maxSubdivisions = [16, 20, 24];
     this.forbiddenNumerators = [7, 11, 13, 15, 17, 19, 21, 22, 23, 24];
     this.allowedDurations = this.getAllowedDurations();
   }
@@ -87,10 +86,6 @@ export default class Improviser {
         /* get base duration and multiples of it */
         const baseDuration = Math.round(wholeNote * (num / den));
 
-        /* get smallest non-zero duration */
-        if (baseDuration > 0) {
-          this.quantumUnit = Math.min(this.quantumUnit, baseDuration);
-        }
         for (let i = 0; i < 4; i++) {
           const duration = baseDuration * 2 ** i;
           if (!durations.includes(duration)) {
@@ -108,10 +103,6 @@ export default class Improviser {
     const i = differences.indexOf(Math.min(...differences));
     const quantized = this.allowedDurations[i];
     return quantized == 0 && !allowZero ? this.allowedDurations[1] : quantized;
-  }
-
-  quantize(time) {
-    return Math.round(time / this.quantumUnit) * this.quantumUnit;
   }
 
   async parse(files) {
@@ -137,17 +128,14 @@ export default class Improviser {
           const note = track.notes[n];
 
           /* adjust time and duration to PPQ */
-          const time = this.quantize(Math.round(note.ticks * PPQRatio));
-          const duration = this.quantize(Math.round(note.durationTicks * PPQRatio));
+          const time = Math.round(note.ticks * PPQRatio);
+          const duration = Math.round(note.durationTicks * PPQRatio);
 
           /* normalize key to C/Am */
           const pitch = note.midi + transp;
 
-          /* quantize duration */
-          const durationTicks = this.getNearestDuration(duration, false);
-
           /* include event in sequence */
-          notes.push([time, pitch, durationTicks]);
+          notes.push([time, pitch, duration]);
         }
       }
       /* sort notes by start time and pitch  */
@@ -166,9 +154,10 @@ export default class Improviser {
 
         /* quantize deltas and durations */
         const deltaTicks = this.getNearestDuration(nextStart - start);
+        const durationTicks = this.getNearestDuration(duration, false);
 
         /* add note to sequence */
-        sequence.push([pitch, deltaTicks, duration]);
+        sequence.push([pitch, deltaTicks, durationTicks]);
       }
       URL.revokeObjectURL(url);
     }
@@ -226,6 +215,7 @@ export default class Improviser {
     stateToMidiNote.bind(this);
     this.markov.run(maxNotes, stateToMidiNote);
     this.applyLegato(midi);
+    console.log(midi.header);
     return midi.toArray();
   }
 

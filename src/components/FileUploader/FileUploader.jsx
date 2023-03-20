@@ -15,7 +15,7 @@ export default function FileUploader() {
     const newFiles = {};
     midiFiles.forEach((file) => {
       if (files[file.name] === undefined) {
-        newFiles[file.name] = { file: file, selected: false };
+        newFiles[file.name] = { file: file, selected: true };
       }
     });
     setFiles((prev) => ({ ...prev, ...newFiles }));
