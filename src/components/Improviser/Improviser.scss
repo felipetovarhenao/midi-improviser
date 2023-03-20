@@ -4,14 +4,27 @@
   @include v-pad($gap-xl);
   @include l-pad($gap-lg);
   .form-container {
-    form {
-      @include v-stack;
+    .form {
+      .train-form,
+      .generate-form {
+        @include l-pad;
+        @include col-grid(2fr 3fr);
+        & > * {
+          @include v-pad;
+        }
+      }
       input[type="number"] {
         @include pad;
         @include v-mar;
       }
       label {
         @include v-mar;
+      }
+      .key-control {
+        @include col-grid(1fr 1fr);
+        select[name="mode"] {
+          @include l-mar;
+        }
       }
     }
   }

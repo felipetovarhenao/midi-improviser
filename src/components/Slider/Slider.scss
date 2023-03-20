@@ -1,0 +1,42 @@
+@import "../../styles/styles.scss";
+
+.Slider {
+  @include col-grid(12fr 2fr);
+  align-items: center;
+
+  // @include vh-mar($gap-sm, $gap-sm);
+  // @include vh-pad($gap-lg, $gap-sm);
+  .slider {
+    @include clickable;
+    background-color: transparent;
+    -webkit-appearance: none;
+    appearance: none;
+    text-decoration: none;
+    /* track */
+    &::-webkit-slider-runnable-track {
+      @include range-track;
+    }
+    &::-moz-range-track {
+      @include range-track;
+    }
+    &::-ms-track {
+      @include range-track;
+    }
+    /* thumb */
+    &::-webkit-slider-thumb {
+      @include range-thumb;
+    }
+    &::-moz-range-thumb {
+      @include range-thumb;
+    }
+    &::-ms-thumb {
+      @include range-thumb;
+    }
+    &:focus {
+      outline: none;
+    }
+  }
+  .value-display {
+    @include to-right;
+  }
+}

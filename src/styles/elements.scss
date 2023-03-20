@@ -7,7 +7,7 @@
   text-decoration: none;
   font-size: $txt-md;
   color: var(--txt);
-  border-color: var(--border);
+  border-color: var(--bord);
   outline-width: $border-sm;
   outline-color: var(--outline);
   box-sizing: border-box;
@@ -47,7 +47,7 @@ select {
 }
 
 hr {
-  background-color: var(--border);
+  background-color: var(--bord);
   border-radius: $radius-md;
   height: $gap-xs;
 }

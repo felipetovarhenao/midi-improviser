@@ -129,13 +129,12 @@ export default class Improviser {
 
           /* adjust time and duration to PPQ */
           const time = Math.round(note.ticks * PPQRatio);
-          const duration = Math.round(note.durationTicks * PPQRatio);
 
           /* normalize key to C/Am */
           const pitch = note.midi + transp;
 
           /* include event in sequence */
-          notes.push([time, pitch, duration]);
+          notes.push([time, pitch]);
         }
       }
       /* sort notes by start time and pitch  */
@@ -150,14 +149,12 @@ export default class Improviser {
         const nextStart = notes[n + 1][0];
 
         const pitch = note[1];
-        const duration = note[2];
 
         /* quantize deltas and durations */
         const deltaTicks = this.getNearestDuration(nextStart - start);
-        const durationTicks = this.getNearestDuration(duration, false);
 
         /* add note to sequence */
-        sequence.push([pitch, deltaTicks, durationTicks]);
+        sequence.push([pitch, deltaTicks]);
       }
       URL.revokeObjectURL(url);
     }
@@ -170,11 +167,7 @@ export default class Improviser {
     this.markov.build(sequence);
   }
 
-  ticksToSeconds(ticks, tempo) {
-    return (60 / (this.PPQ * tempo)) * ticks;
-  }
-
-  async generate(maxNotes = 100, tempo = 90, key = "C", scale = "major") {
+  async generate(maxNotes = 100, tempo = 90, key = "C", scale = "major", choiceReinforcement = 0.0) {
     /* intialize midi */
     var midi = new Midi();
 
@@ -196,55 +189,93 @@ export default class Improviser {
     /* initialize start time in ticks  */
     let ticks = 0;
 
+    /* initialize variables to collect chord info */
+    const chordSizes = {};
+    let maxChordSize = 0;
+    let chordSize = 0;
+
     /* This function will be called with every new Markov prediction */
     const stateToMidiNote = (state) => {
-      const [pitch, deltaTicks, durationTicks] = state;
-      const duration = this.ticksToSeconds(durationTicks, tempo);
-
-      /* prevent notes being added to same time point */
+      const [pitch, deltaTicks] = state;
 
       track.addNote({
         midi: pitch - transp,
         ticks: ticks,
-        duration: duration,
+        durationTicks: this.PPQ,
         velocity: 0.5,
       });
+
+      chordSize++;
+
+      /* if a new chord is next, add chord size information to array and reset chord size */
+      if (deltaTicks > 0) {
+        chordSizes[ticks] = chordSize;
+        maxChordSize = Math.max(chordSize, maxChordSize);
+        chordSize = 0;
+      }
+
       ticks += deltaTicks;
     };
+
     /* bind callback to instance */
     stateToMidiNote.bind(this);
-    this.markov.run(maxNotes, stateToMidiNote);
-    midi = this.applyLegato(midi);
+    this.markov.run(maxNotes, stateToMidiNote, choiceReinforcement);
+    midi = this.cleanMidi(midi, chordSizes, maxChordSize);
     return midi.toArray();
   }
 
-  applyLegato(midi) {
-    let lastChord = [];
-    let lastStart = midi.tracks[0]?.notes[0]?.ticks;
+  chordSizeToVelocity(time, chordSizes, maxChordSize) {
+    /* returns a normalized velocity value based on chord size */
+    return ((chordSizes[time] || maxChordSize / 2) / maxChordSize) * 0.2 + 0.7;
+  }
 
+  pitchToVelocity(pitch, velRange = 0.125) {
+    /* returns a normalized velocity value based on pitch range */
+    const theta = Math.min(1, Math.max(0, (pitch - 21) / 88)) * Math.PI * 2;
+    return Math.cos(theta) * velRange + (1.0 - velRange);
+  }
+
+  /* 
+  Applies legato duration and variable velocity to every note in MIDI file.
+  */
+  cleanMidi(midi, chordSizes, maxChordSize) {
     /* Iterate through every track */
     for (let trackID = 0; trackID < midi.tracks.length; trackID++) {
       const track = midi.tracks[trackID];
 
-      /* Iterate through every note in track */
-      for (let noteID = 0; noteID < track.notes.length; noteID++) {
-        const note = track.notes[noteID];
-        if (note.ticks > lastStart) {
-          /* get duration for last chord to avoid sustain overlap */
-          const legatoDuration = note.ticks - lastStart;
+      /* initialize variables to keep track of chord and onset */
+      let currentChord = [];
+      let currentOnset = track?.notes[0]?.ticks;
 
-          /* trim duration if there's overlap */
-          lastChord.forEach((note) => {
+      /* Iterate through every note in track */
+      for (let noteID = 0; noteID < track?.notes?.length; noteID++) {
+        const note = track.notes[noteID];
+
+        /* modify notes in current chord before onset changes */
+        if (note.ticks !== currentOnset) {
+          /* get legato duration for current chord to avoid sustain overlap */
+          const legatoDuration = note.ticks - currentOnset;
+
+          /* get velocity based on chord size */
+          let vel = this.chordSizeToVelocity(currentOnset, chordSizes, maxChordSize);
+
+          /* to every note, apply legato duration and assign velocity value based on context */
+          currentChord.forEach((note) => {
+            /* update duration */
             midi.tracks[note.trackID].notes[note.noteID].durationTicks = legatoDuration;
+
+            /* update velocity */
+            const pitch = midi.tracks[note.trackID].notes[note.noteID].midi;
+            midi.tracks[note.trackID].notes[note.noteID].velocity = vel * this.pitchToVelocity(pitch);
           });
 
-          /* reset chord and update last start time  */
-          lastChord = [];
-          lastStart = note.ticks;
+          /* reset chord and update onset */
+          currentChord = [];
+          currentOnset = note.ticks;
         }
 
-        /* keep reference of track and note id */
-        lastChord.push({
+        /* keep reference of MIDI track and note id*/
+        currentChord.push({
           noteID: noteID,
           trackID: trackID,
         });
