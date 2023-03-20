@@ -3,7 +3,11 @@
 
 ## Description
 
-**MIDI improviser** is an interactive, Markov-based MIDI generator for the browser. To try it, click [here](https://felipe-tovar-henao.com/midi-improviser)
+**MIDI improviser** is a web application that automatically generates music as a MIDI file, based on one or more MIDI input files provided by the user. The degree of freedom or *creativity* of the improviser is determined by a *memory* value. The lower the memory value, the less
+similar the resulting music is to the original MIDI, while a higher memory value will generate music that closely resembles the selected
+MIDI file(s).
+        
+To use **MIDI improviser**, click [here](https://felipe-tovar-henao.com/midi-improviser).
 
 ## License
 ISC License

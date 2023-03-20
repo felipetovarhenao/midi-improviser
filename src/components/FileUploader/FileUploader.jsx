@@ -75,7 +75,9 @@ export default function FileUploader() {
         <div className="buttons">
           <label htmlFor="midi">Add files</label>
           <input type="file" id="midi" accept=".mid, .midi, audio/midi" onChange={appendFiles} multiple />
-          <button onClick={() => setAllToggles(true)}>Select all</button>
+          <button onClick={() => setAllToggles(true)} disabled={Object.keys(files).length === 0}>
+            Select all
+          </button>
           <button onClick={() => setAllToggles(false)} disabled={!numSelected}>
             Clear
           </button>
@@ -83,7 +85,7 @@ export default function FileUploader() {
             Remove
           </button>
         </div>
-        <div>{numSelected > 0 && `${numSelected} file(s) selected`}</div>
+        <div className="status">{numSelected > 0 && `${numSelected} file(s) selected`}</div>
       </div>
     </div>
   );

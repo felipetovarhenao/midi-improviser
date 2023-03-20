@@ -33,4 +33,8 @@
     @include v-mar;
     color: var(--txt2);
   }
+  .status {
+    @include v-mar;
+    text-align: center;
+  }
 }
