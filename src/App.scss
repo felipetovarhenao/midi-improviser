@@ -1,13 +1,16 @@
 @import "./styles/styles.scss";
 .App {
   @include pad($gap-lg);
-  width: 60vw;
+  max-width: 1080px;
   @include v-stack;
   @include h-center;
   min-height: 100vh;
   .modules {
     @include v-pad($gap-lg);
     @include col-grid(1fr 1fr);
+    @include desktop-down {
+      @include col-grid(1fr);
+    }
   }
   .footer {
     @include to-bottom;
