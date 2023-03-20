@@ -16,11 +16,18 @@
     @include to-bottom;
     @include h-center;
     @include v-pad;
+    align-items: center;
     a {
+      @include h-pad;
+      vertical-align: middle;
       color: var(--primary);
       &:hover {
         color: var(--secondary);
       }
+    }
+    .gh-icon {
+      vertical-align: middle;
+      font-size: $txt-xl;
     }
   }
 }

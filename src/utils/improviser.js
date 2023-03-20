@@ -214,28 +214,42 @@ export default class Improviser {
     /* bind callback to instance */
     stateToMidiNote.bind(this);
     this.markov.run(maxNotes, stateToMidiNote);
-    this.applyLegato(midi);
-    console.log(midi.header);
+    midi = this.applyLegato(midi);
     return midi.toArray();
   }
 
   applyLegato(midi) {
-    const noteEndings = {};
-    midi.tracks.forEach((track, i) =>
-      track.notes.forEach((note, j) => {
-        const lastEnding = noteEndings[note.midi];
-        if (lastEnding?.end > note.ticks) {
-          const trackId = lastEnding.track;
-          const noteId = lastEnding.note;
-          const newDuration = note.ticks - midi.tracks[trackId].notes[noteId].ticks;
-          midi.tracks[trackId].notes[noteId].durationTicks = newDuration > 0 ? newDuration : this.allowedDurations[1];
+    let lastChord = [];
+    let lastStart = midi.tracks[0]?.notes[0]?.ticks;
+
+    /* Iterate through every track */
+    for (let trackID = 0; trackID < midi.tracks.length; trackID++) {
+      const track = midi.tracks[trackID];
+
+      /* Iterate through every note in track */
+      for (let noteID = 0; noteID < track.notes.length; noteID++) {
+        const note = track.notes[noteID];
+        if (note.ticks > lastStart) {
+          /* get duration for last chord to avoid sustain overlap */
+          const legatoDuration = note.ticks - lastStart;
+
+          /* trim duration if there's overlap */
+          lastChord.forEach((note) => {
+            midi.tracks[note.trackID].notes[note.noteID].durationTicks = legatoDuration;
+          });
+
+          /* reset chord and update last start time  */
+          lastChord = [];
+          lastStart = note.ticks;
         }
-        noteEndings[note.midi] = {
-          track: i,
-          note: j,
-          end: note.ticks + note.durationTicks,
-        };
-      })
-    );
+
+        /* keep reference of track and note id */
+        lastChord.push({
+          noteID: noteID,
+          trackID: trackID,
+        });
+      }
+    }
+    return midi;
   }
 }

@@ -37,10 +37,8 @@ export default function Improviser() {
     const bufferArray = await improviser.generate(Number(numNotes), Number(tempo), keySignature, keyMode);
     const blob = new Blob([bufferArray], { type: "audio/midi" });
     const url = URL.createObjectURL(blob);
-    setTimeout(() => {
-      setDownloadURL(url);
-      setStatus("done generating!");
-    }, 250);
+    setDownloadURL(url);
+    setStatus("done generating!");
   }
 
   function makeFileName() {
@@ -135,8 +133,11 @@ export default function Improviser() {
                 link.click();
                 setStatus("downloading...");
                 setTimeout(() => {
+                  console.log(downloadURL);
+                  URL.revokeObjectURL(downloadURL);
                   setStatus(false);
                 }, 2000);
+                setDownloadURL(false);
               }}
             >
               Download

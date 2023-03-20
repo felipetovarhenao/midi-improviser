@@ -1,9 +1,9 @@
-# MIDI improviser
+# [MIDI improviser](https://felipe-tovar-henao.com/midi-improviser) :musical_keyboard: 
 -----------------------
 
 ## Description
 
-**MIDI improviser** is a web application that automatically generates music as a MIDI file, based on one or more MIDI input files provided by the user. The degree of freedom or *creativity* of the improviser is determined by a *memory* value. The lower the memory value, the less
+**MIDI improviser** is a web application that automatically generates polyphonic music as a MIDI file, based on one or more MIDI input files provided by the user. The degree of freedom or *creativity* of the improviser is determined by a *memory* value. The lower the memory value, the less
 similar the resulting music is to the original MIDI, while a higher memory value will generate music that closely resembles the selected
 MIDI file(s).
         
