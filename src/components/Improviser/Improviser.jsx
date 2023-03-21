@@ -18,7 +18,8 @@ function setStorageValue(setValue, key) {
 }
 
 function getStorageValue(key) {
-  return JSON.parse(localStorage.getItem(key));
+  const item = localStorage.getItem(key);
+  return item ? JSON.parse(item) : undefined;
 }
 
 export default function Improviser() {

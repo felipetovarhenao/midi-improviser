@@ -254,7 +254,7 @@ export default class Improviser {
 
   chordSizeToVelocity(time, chordSizes, maxChordSize) {
     /* returns a normalized velocity value based on chord size */
-    return ((chordSizes[time] || maxChordSize / 2) / maxChordSize) * 0.2 + 0.7;
+    return ((chordSizes[time] || maxChordSize / 2) / maxChordSize) * 0.25 + 0.65;
   }
 
   pitchToVelocity(pitch, velRange = 0.125) {
@@ -274,7 +274,7 @@ export default class Improviser {
       /* initialize variables to keep track of chord and onset */
       let currentChord = [];
       let currentOnset = track?.notes[0]?.ticks;
-
+      let vel = this.chordSizeToVelocity(currentOnset, chordSizes, maxChordSize);
       /* Iterate through every note in track */
       for (let noteID = 0; noteID < track?.notes?.length; noteID++) {
         const note = track.notes[noteID];
@@ -284,8 +284,8 @@ export default class Improviser {
           /* get legato duration for current chord to avoid sustain overlap */
           const legatoDuration = note.ticks - currentOnset;
 
-          /* get velocity based on chord size */
-          let vel = this.chordSizeToVelocity(currentOnset, chordSizes, maxChordSize);
+          /* get velocity based on chord size and smoothen based on previous velocity */
+          vel = this.chordSizeToVelocity(currentOnset, chordSizes, maxChordSize) * 0.8 + vel * 0.2;
 
           /* to every note, apply legato duration and assign velocity value based on context */
           currentChord.forEach((note) => {
