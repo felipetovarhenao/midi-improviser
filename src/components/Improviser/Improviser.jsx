@@ -10,22 +10,33 @@ import Slider from "../Slider/Slider";
 import HelpBox from "../HelpBox/HelpBox";
 import ButtonPanel from "../ButtonPanel/ButtonPanel";
 
+function setStorageValue(setValue, key) {
+  return (value) => {
+    setValue(value);
+    localStorage.setItem(key, JSON.stringify(value));
+  };
+}
+
+function getStorageValue(key) {
+  return JSON.parse(localStorage.getItem(key));
+}
+
 export default function Improviser() {
   const { improviser } = useContext(ImproviserContext);
   const { files } = useContext(FileUploaderContext);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [downloadURL, setDownloadURL] = useState(false);
   const [isTrained, setIsTrained] = useState(false);
+  const [status, setStatus] = useState(false);
 
   /* UI control parameters */
-  const [numNotes, setNumNotes] = useState(500);
-  const [tempo, setTempo] = useState(90);
-  const [markovOrder, setMarkovOrder] = useState(2);
-  const [status, setStatus] = useState(false);
-  const [keySignature, setKeySignature] = useState("C");
-  const [keyMode, setKeyMode] = useState("major");
-  const [reinforcementFactor, setReinforcementFactor] = useState(90);
-  const [enforceKey, setEnforceKey] = useState(false);
+  const [numNotes, setNumNotes] = useState(getStorageValue("numNotes") || 500);
+  const [tempo, setTempo] = useState(getStorageValue("tempo") || 90);
+  const [markovOrder, setMarkovOrder] = useState(getStorageValue("markovOrder") || 2);
+  const [keySignature, setKeySignature] = useState(getStorageValue("keySignature") || "C");
+  const [keyMode, setKeyMode] = useState(getStorageValue("keyMode") || "major");
+  const [reinforcementFactor, setReinforcementFactor] = useState(getStorageValue("reinforcementFactor") || 90);
+  const [enforceKey, setEnforceKey] = useState(getStorageValue("enforceKey") || false);
 
   async function train() {
     /* convert String to Number */
@@ -101,7 +112,7 @@ export default function Improviser() {
               outMin={1}
               outMax={9}
               setValue={(value) => {
-                setMarkovOrder(value);
+                setStorageValue(setMarkovOrder, "markovOrder")(value);
                 setIsTrained(false);
               }}
             />
@@ -116,12 +127,20 @@ export default function Improviser() {
               Max. number of notes
               <HelpBox>Maximum number of notes to be generated.</HelpBox>
             </label>
-            <Slider name={"num-notes"} value={numNotes} inMin={10} inMax={5000} outMin={10} outMax={5000} setValue={setNumNotes} />
+            <Slider
+              name={"num-notes"}
+              value={numNotes}
+              inMin={10}
+              inMax={5000}
+              outMin={10}
+              outMax={5000}
+              setValue={setStorageValue(setNumNotes, "numNotes")}
+            />
             <label htmlFor="tempo">
               Tempo
               <HelpBox>Desired tempo in beats per minute (BPM)</HelpBox>
             </label>
-            <Slider name={"tempo"} value={tempo} inMin={10} inMax={640} outMin={10} outMax={640} setValue={setTempo} />
+            <Slider name={"tempo"} value={tempo} inMin={10} inMax={640} outMin={10} outMax={640} setValue={setStorageValue(setTempo, "tempo")} />
             <label htmlFor="reinforcement-slider">
               Choice reinforcement
               <HelpBox>
@@ -133,7 +152,11 @@ export default function Improviser() {
                 <p>A higher value increases the chances of generating more cohesive/predictable music.</p>
               </HelpBox>
             </label>
-            <Slider name={"reinforcement-slider"} value={reinforcementFactor} setValue={setReinforcementFactor} />
+            <Slider
+              name={"reinforcement-slider"}
+              value={reinforcementFactor}
+              setValue={setStorageValue(setReinforcementFactor, "reinforcementFactor")}
+            />
             <label htmlFor="keySignature">
               Key signature
               <HelpBox>
@@ -141,7 +164,12 @@ export default function Improviser() {
               </HelpBox>
             </label>
             <div className="key-control">
-              <select name="key" id="keySignature" onChange={(e) => setKeySignature(e.target.value)} defaultValue={keySignature}>
+              <select
+                name="key"
+                id="keySignature"
+                onChange={(e) => setStorageValue(setKeySignature, "keySignature")(e.target.value)}
+                defaultValue={keySignature}
+              >
                 {improviser &&
                   Object.keys(improviser.PITCHNAMES).map((keySig, i) => (
                     <option key={i} value={keySig}>
@@ -149,7 +177,7 @@ export default function Improviser() {
                     </option>
                   ))}
               </select>
-              <select name="mode" id="keyMode" onChange={(e) => setKeyMode(e.target.value)} defaultValue={keyMode}>
+              <select name="mode" id="keyMode" onChange={(e) => setStorageValue(setKeyMode, "keyMode")(e.target.value)} defaultValue={keyMode}>
                 {["major", "minor"].map((mode, i) => (
                   <option key={i} value={mode}>
                     {mode}
@@ -158,7 +186,12 @@ export default function Improviser() {
               </select>
               <div className="enforce-key-container">
                 <label htmlFor="enforce-key">Enforce</label>
-                <input name="enforce-key" type="checkbox" value={enforceKey} onChange={(e) => setEnforceKey(e.target.checked)} />
+                <input
+                  name="enforce-key"
+                  type="checkbox"
+                  value={enforceKey}
+                  onChange={(e) => setStorageValue(setEnforceKey, "enforceKey")(e.target.checked)}
+                />
               </div>
             </div>
           </div>
