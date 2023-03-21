@@ -1,0 +1,32 @@
+@import "../../styles/styles.scss";
+
+.help-box {
+  cursor: pointer;
+  position: relative;
+  .icon {
+    &,
+    * {
+      vertical-align: middle;
+    }
+  }
+  .help-box-inner {
+    @include round-border;
+    @include vh-pad($gap-md, $gap-ml);
+    position: absolute;
+    max-width: 300px;
+    width: max-content;
+    overflow-y: auto;
+    background-color: var(--bg1);
+    translate: $txt-sm $txt-sm;
+    text-transform: none;
+    text-align: left;
+    white-space: pre-wrap;
+    z-index: 1;
+    &,
+    p,
+    b,
+    i {
+      font-size: $txt-ms;
+    }
+  }
+}

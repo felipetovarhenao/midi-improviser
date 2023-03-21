@@ -18,7 +18,12 @@
         @include v-mar;
       }
       label {
+        @include h-stack;
         @include v-mar;
+        .help-box {
+          @include l-pad;
+          vertical-align: middle;
+        }
       }
       .key-control {
         @include col-grid(1fr 1fr 1fr);

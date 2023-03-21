@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { FileUploaderContext } from "./FileUploaderProvider";
 import Toggle from "../Toggle/Toggle";
 import "./FileUploader.scss";
+import ButtonPanel from "../ButtonPanel/ButtonPanel";
 
 export default function FileUploader() {
   const { files, setFiles } = useContext(FileUploaderContext);
@@ -72,19 +73,19 @@ export default function FileUploader() {
               );
             })}
         </div>
-        <div className="buttons">
-          <label htmlFor="midi">Add files</label>
+        <ButtonPanel>
           <input type="file" id="midi" accept=".mid, .midi, audio/midi" onChange={appendFiles} multiple />
           <button onClick={() => setAllToggles(true)} disabled={Object.keys(files).length === 0}>
             Select all
           </button>
           <button onClick={() => setAllToggles(false)} disabled={!numSelected}>
-            Clear
+            Clear selection
           </button>
+          <label htmlFor="midi">Add files</label>
           <button className="danger" onClick={deleteSelected} disabled={!numSelected}>
-            Remove
+            Remove files
           </button>
-        </div>
+        </ButtonPanel>
         <div className="status">{numSelected > 0 && `${numSelected} file(s) selected`}</div>
       </div>
     </div>

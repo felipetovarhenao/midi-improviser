@@ -1,0 +1,15 @@
+@import "../../styles/styles.scss";
+
+.ButtonPanel {
+  @include col-grid(1fr 1fr);
+  @include v-mar($gap-md);
+  gap: $gap-md;
+  & > * {
+    @include btn;
+    margin: 0px;
+    text-align: center;
+    font-size: $txt-ms;
+    font-weight: bold;
+    width: 100%;
+  }
+}

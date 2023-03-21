@@ -7,6 +7,9 @@ import { FileUploaderContext } from "../FileUploader/FileUploaderProvider";
 import classNames from "classnames";
 import Slider from "../Slider/Slider";
 
+import HelpBox from "../HelpBox/HelpBox";
+import ButtonPanel from "../ButtonPanel/ButtonPanel";
+
 export default function Improviser() {
   const { improviser } = useContext(ImproviserContext);
   const { files } = useContext(FileUploaderContext);
@@ -83,7 +86,13 @@ export default function Improviser() {
       <div className="form-container">
         <form className="form" onSubmit={(e) => e.preventDefault()}>
           <div className="train-form">
-            <label htmlFor="memory">Memory</label>
+            <label htmlFor="memory">
+              Memory{" "}
+              <HelpBox>
+                <i>Memory</i> controls the amount of contextual information the improviser learns from the MIDI files. A higher memory value results
+                in music that more closely resembles the selected MIDI files.
+              </HelpBox>
+            </label>
             <Slider
               name={"memory"}
               value={markovOrder}
@@ -97,19 +106,40 @@ export default function Improviser() {
               }}
             />
           </div>
-          <div className="buttons">
+          <ButtonPanel>
             <button onClick={train} disabled={!selectedFiles.length}>
               Train
             </button>
-          </div>
+          </ButtonPanel>
           <div className="generate-form">
-            <label htmlFor="num-notes">Max. number of notes</label>
+            <label htmlFor="num-notes">
+              Max. number of notes
+              <HelpBox>Maximum number of notes to be generated.</HelpBox>
+            </label>
             <Slider name={"num-notes"} value={numNotes} inMin={10} inMax={5000} outMin={10} outMax={5000} setValue={setNumNotes} />
-            <label htmlFor="tempo">Initial tempo</label>
+            <label htmlFor="tempo">
+              Tempo
+              <HelpBox>Desired tempo in beats per minute (BPM)</HelpBox>
+            </label>
             <Slider name={"tempo"} value={tempo} inMin={10} inMax={640} outMin={10} outMax={640} setValue={setTempo} />
-            <label htmlFor="reinforcement-slider">Choice reinforcement</label>
+            <label htmlFor="reinforcement-slider">
+              Choice reinforcement
+              <HelpBox>
+                <p>
+                  Degree to which the improviser can update its musical knowledge during the improvisation, encouraging the repetition of previously
+                  made choices.
+                </p>
+                <br />
+                <p>A higher value increases the chances of generating more cohesive/predictable music.</p>
+              </HelpBox>
+            </label>
             <Slider name={"reinforcement-slider"} value={reinforcementFactor} setValue={setReinforcementFactor} />
-            <label htmlFor="keySignature">Key signature</label>
+            <label htmlFor="keySignature">
+              Key signature
+              <HelpBox>
+                Desired key signature. If enforced, the improviser will <b>only</b> use pitches from the specified key.
+              </HelpBox>
+            </label>
             <div className="key-control">
               <select name="key" id="keySignature" onChange={(e) => setKeySignature(e.target.value)} defaultValue={keySignature}>
                 {improviser &&
@@ -132,7 +162,8 @@ export default function Improviser() {
               </div>
             </div>
           </div>
-          <div className="buttons">
+
+          <ButtonPanel>
             <button onClick={generate} disabled={!isTrained}>
               Generate
             </button>
@@ -153,7 +184,7 @@ export default function Improviser() {
             >
               Download
             </button>
-          </div>
+          </ButtonPanel>
         </form>
         {status && <div className="status">{status}</div>}
       </div>

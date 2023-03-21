@@ -14,19 +14,11 @@
     overflow: auto;
     background-color: var(--bg2);
   }
-  .buttons {
-    @include h-stack-c;
-    width: 100%;
-    justify-content: space-between;
-    button,
+  .ButtonPanel {
     label {
-      @include btn;
-      @include mar;
-      text-align: center;
-      font-size: $txt-ms;
-      font-weight: bold;
-      width: 100%;
-      height: 100%;
+      @include stack;
+      justify-content: center;
+      align-items: center;
     }
   }
   .description {
