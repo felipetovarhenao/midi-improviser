@@ -176,9 +176,28 @@ export default class Improviser {
     this.markov.build(sequence);
   }
 
-  async generate(maxNotes = 100, tempo = 90, key = "C", scale = "major", choiceReinforcement = 0.0) {
+  getPitchQuantizer(key, scale) {
+    const pitchDeltas =
+      scale === "major"
+        ? // pitch shifting per pitch class in major scale
+          [0, 1, 0, 1, 0, 0, -1, 0, 1, 0, 1, 0]
+        : // pitch shifting per pitch class in minor scale
+          [0, -1, 0, -1, 0, 0, -1, 0, 0, 0, 1, 0];
+
+    const transp = -this.getTranspositionInterval(key, scale);
+    const table = {};
+    for (let i = 0; i < pitchDeltas.length; i++) {
+      const id = (i + transp + 12) % 12;
+      table[id] = pitchDeltas[i];
+    }
+
+    return (pitch) => pitch + table[(pitch + 12) % 12];
+  }
+
+  async generate(maxNotes = 100, tempo = 90, key = "C", scale = "major", choiceReinforcement = 0.0, enforceKey = true) {
     /* intialize midi */
     var midi = new Midi();
+    const pitchQuantizer = enforceKey && this.getPitchQuantizer(key, scale);
 
     /* set tempo */
     midi.header.setTempo(tempo);
@@ -206,9 +225,9 @@ export default class Improviser {
     /* This function will be called with every new Markov prediction */
     const stateToMidiNote = (state) => {
       const [pitch, deltaTicks] = state;
-
+      const transPitch = pitch - transp;
       track.addNote({
-        midi: pitch - transp,
+        midi: enforceKey ? pitchQuantizer(transPitch) : transPitch,
         ticks: ticks,
         durationTicks: this.PPQ,
         velocity: 0.5,

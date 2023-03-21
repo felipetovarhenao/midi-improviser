@@ -21,10 +21,20 @@
         @include v-mar;
       }
       .key-control {
-        @include col-grid(1fr 1fr);
+        @include col-grid(1fr 1fr 1fr);
+        align-items: center;
         select[name="mode"] {
           @include l-mar;
         }
+        .enforce-key-container {
+          @include h-stack-c;
+          @include h-center;
+          align-items: center;
+          label {
+            @include h-pad;
+          }
+        }
+        // input {}
       }
     }
   }

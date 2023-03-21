@@ -22,6 +22,7 @@ export default function Improviser() {
   const [keySignature, setKeySignature] = useState("C");
   const [keyMode, setKeyMode] = useState("major");
   const [reinforcementFactor, setReinforcementFactor] = useState(90);
+  const [enforceKey, setEnforceKey] = useState(false);
 
   async function train() {
     /* convert String to Number */
@@ -40,7 +41,14 @@ export default function Improviser() {
   async function generate() {
     setDownloadURL(false);
     setStatus("generating MIDI...");
-    const bufferArray = await improviser.generate(Number(numNotes), Number(tempo), keySignature, keyMode, Number(reinforcementFactor) / 100);
+    const bufferArray = await improviser.generate(
+      Number(numNotes),
+      Number(tempo),
+      keySignature,
+      keyMode,
+      Number(reinforcementFactor) / 100,
+      Boolean(enforceKey)
+    );
     const blob = new Blob([bufferArray], { type: "audio/midi" });
     const url = URL.createObjectURL(blob);
     setDownloadURL(url);
@@ -118,6 +126,10 @@ export default function Improviser() {
                   </option>
                 ))}
               </select>
+              <div className="enforce-key-container">
+                <label htmlFor="enforce-key">Enforce</label>
+                <input name="enforce-key" type="checkbox" value={enforceKey} onChange={(e) => setEnforceKey(e.target.checked)} />
+              </div>
             </div>
           </div>
           <div className="buttons">
