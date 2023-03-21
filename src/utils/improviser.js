@@ -140,6 +140,10 @@ export default class Improviser {
       /* sort notes by start time and pitch  */
       notes.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
 
+      /* lastDelta refers to the inter-onset duration 
+      between the current note and the last chord */
+      let lastDelta = 0;
+
       for (let n = 0; n < notes.length - 1; n++) {
         /* get note */
         const note = notes[n];
@@ -154,10 +158,15 @@ export default class Improviser {
         const deltaTicks = this.getNearestDuration(nextStart - start);
 
         /* add note to sequence */
-        sequence.push([pitch, deltaTicks]);
+        sequence.push([pitch, deltaTicks, lastDelta]);
+
+        if (deltaTicks > 0) {
+          lastDelta = deltaTicks;
+        }
       }
       URL.revokeObjectURL(url);
     }
+
     return sequence;
   }
 
