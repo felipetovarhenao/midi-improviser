@@ -20,6 +20,7 @@
       label {
         @include h-stack;
         @include v-mar;
+        @include wrap;
         .help-box {
           @include l-pad;
           vertical-align: middle;
