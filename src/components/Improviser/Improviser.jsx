@@ -94,7 +94,7 @@ export default function Improviser() {
   return (
     <div className="Improviser">
       <h2>SETTINGS</h2>
-      <p className="description">Set the configuration for MIDI generation</p>
+      <p className="description">Set the training and MIDI improvisation settings.</p>
       <div className="form-container">
         <form className="form" onSubmit={(e) => e.preventDefault()}>
           <div className="train-form">

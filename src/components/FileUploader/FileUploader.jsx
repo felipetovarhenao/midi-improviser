@@ -56,7 +56,7 @@ export default function FileUploader() {
   return (
     <div className="FileUploader">
       <div>
-        <h2>File menu</h2>
+        <h2>FILE BROWSER</h2>
         <p className="description">Upload MIDI files, and select the ones you want to use to train the improviser.</p>
         <div className="file-menu">
           {Object.keys(files)

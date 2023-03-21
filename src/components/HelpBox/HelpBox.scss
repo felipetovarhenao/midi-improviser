@@ -3,10 +3,13 @@
 .help-box {
   cursor: pointer;
   position: relative;
+  @include v-center;
   .icon {
     &,
     * {
+      color: var(--secondary);
       vertical-align: middle;
+      justify-content: center;
     }
   }
   .help-box-inner {

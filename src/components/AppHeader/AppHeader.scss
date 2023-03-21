@@ -3,8 +3,16 @@
 .AppHeader {
   .header {
     @include v-pad($gap-lg);
-    font-size: $txt-xl;
-    text-align: center;
+    .logo {
+      @include h-center;
+      justify-content: center;
+      align-items: center;
+      max-height: 100px;
+    }
+    .title {
+      font-size: $txt-xl;
+      text-align: center;
+    }
   }
   .icon {
     @include r-pad($gap-lg);
