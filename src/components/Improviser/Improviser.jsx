@@ -135,6 +135,7 @@ export default function Improviser() {
               inMax={5000}
               outMin={10}
               outMax={5000}
+              step={10}
               setValue={setStorageValue(setNumNotes, "numNotes")}
             />
             <label htmlFor="tempo">
