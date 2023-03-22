@@ -16,8 +16,8 @@ export default class MarkovModel {
     this.stateWeights = {};
   }
 
-  setOrder(order) {
-    this.reset();
+  setOrder(order, reset = true) {
+    reset && this.reset();
     this.order = order;
   }
 

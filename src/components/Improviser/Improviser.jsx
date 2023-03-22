@@ -10,6 +10,8 @@ import Slider from "../Slider/Slider";
 import HelpBox from "../HelpBox/HelpBox";
 import ButtonPanel from "../ButtonPanel/ButtonPanel";
 
+import { Midi } from "@tonejs/midi";
+
 function setStorageValue(setValue, key) {
   return (value) => {
     setValue(value);
@@ -20,6 +22,22 @@ function setStorageValue(setValue, key) {
 function getStorageValue(key) {
   const item = localStorage.getItem(key);
   return item ? JSON.parse(item) : undefined;
+}
+
+/* cache for all midi files loaded in current session */
+const FILE_CACHE = {};
+
+function filesToMidi(files) {
+  return files.map(async (file) => {
+    if (FILE_CACHE[file.name]) {
+      return FILE_CACHE[file.name];
+    } else {
+      const url = URL.createObjectURL(file);
+      const midi = await Midi.fromUrl(url);
+      FILE_CACHE[file.name] = midi;
+      return midi;
+    }
+  });
 }
 
 export default function Improviser() {
@@ -47,7 +65,10 @@ export default function Improviser() {
     }
     setIsTrained(false);
     setStatus(`training improviser (memory size: ${markovOrder})...`);
-    await improviser.train(selectedFiles);
+    const midiFiles = filesToMidi(selectedFiles);
+
+    await improviser.trainBase(midiFiles);
+
     setStatus("done training!");
     setIsTrained(true);
     setDownloadURL(false);
@@ -56,7 +77,7 @@ export default function Improviser() {
   async function generate() {
     setDownloadURL(false);
     setStatus("generating MIDI...");
-    const bufferArray = await improviser.generate(
+    const bufferArray = await improviser.generateBase(
       Number(numNotes),
       Number(tempo),
       keySignature,

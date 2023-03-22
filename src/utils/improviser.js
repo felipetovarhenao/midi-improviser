@@ -46,8 +46,8 @@ export default class Improviser {
     return this.markov.order;
   }
 
-  setMemory(num) {
-    this.markov.setOrder(num);
+  setMemory(num, reset = true) {
+    this.markov.setOrder(num, reset);
   }
 
   midiToPitch(midi) {
@@ -108,8 +108,7 @@ export default class Improviser {
   async parse(files) {
     const sequence = [];
     for (let i = 0; i < files.length; i++) {
-      const url = URL.createObjectURL(files[i]);
-      const midi = await Midi.fromUrl(url);
+      const midi = await files[i];
       const PPQRatio = this.PPQ / midi.header.ppq;
       const notes = [];
       const keySignature = midi.header.keySignatures[0];
@@ -164,9 +163,7 @@ export default class Improviser {
           lastDelta = deltaTicks;
         }
       }
-      URL.revokeObjectURL(url);
     }
-
     return sequence;
   }
 
@@ -174,6 +171,13 @@ export default class Improviser {
     this.reset();
     const sequence = await this.parse(files);
     this.markov.build(sequence);
+  }
+
+  async trainBase(files) {
+    const order = this.getMemory();
+    this.setMemory(1);
+    await this.train(files);
+    this.setMemory(order, false);
   }
 
   getPitchQuantizer(key, scale) {
@@ -249,6 +253,22 @@ export default class Improviser {
     stateToMidiNote.bind(this);
     this.markov.run(maxNotes, stateToMidiNote, choiceReinforcement);
     midi = this.cleanMidi(midi, chordSizes, maxChordSize);
+    return midi;
+  }
+
+  async generateBase(maxNotes = 100, tempo = 90, key = "C", scale = "major", choiceReinforcement = 0.0, enforceKey = true) {
+    let midi;
+    for (let i = 0; i < this.getMemory(); i++) {
+      const improv = new Improviser(i + 1);
+      const extraNotes = Math.floor(maxNotes * (1 - i / Math.max(1, this.getMemory() - 1)));
+      if (i === 0) {
+        improv.markov.transitionTable = this.markov.transitionTable;
+        improv.markov.stateWeights = this.markov.stateWeights;
+      } else {
+        await improv.train([midi]);
+      }
+      midi = await improv.generate(maxNotes + extraNotes, tempo, key, scale, choiceReinforcement, enforceKey);
+    }
     return midi.toArray();
   }
 
