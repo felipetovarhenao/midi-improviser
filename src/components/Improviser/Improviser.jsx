@@ -51,7 +51,7 @@ export default function Improviser() {
   /* UI control parameters */
   const [numNotes, setNumNotes] = useState(getStorageValue("numNotes") || 500);
   const [tempo, setTempo] = useState(getStorageValue("tempo") || 90);
-  const [markovOrder, setMarkovOrder] = useState(getStorageValue("markovOrder") || 2);
+  const [markovOrder, setMarkovOrder] = useState(getStorageValue("markovOrder") || 5);
   const [keySignature, setKeySignature] = useState(getStorageValue("keySignature") || "C");
   const [keyMode, setKeyMode] = useState(getStorageValue("keyMode") || "major");
   const [reinforcementFactor, setReinforcementFactor] = useState(getStorageValue("reinforcementFactor") || 90);
@@ -77,7 +77,7 @@ export default function Improviser() {
   async function generate() {
     setDownloadURL(false);
     setStatus("generating MIDI...");
-    const bufferArray = await improviser.generateBase(
+    const bufferArray = await improviser.generateRecursively(
       Number(numNotes),
       Number(tempo),
       keySignature,
@@ -85,6 +85,7 @@ export default function Improviser() {
       Number(reinforcementFactor) / 100,
       Boolean(enforceKey)
     );
+
     const blob = new Blob([bufferArray], { type: "audio/midi" });
     const url = URL.createObjectURL(blob);
     setDownloadURL(url);
@@ -130,9 +131,9 @@ export default function Improviser() {
               name={"memory"}
               value={markovOrder}
               inMin={1}
-              inMax={9}
+              inMax={10}
               outMin={1}
-              outMax={9}
+              outMax={10}
               setValue={(value) => {
                 setStorageValue(setMarkovOrder, "markovOrder")(value);
                 setIsTrained(false);
@@ -210,7 +211,7 @@ export default function Improviser() {
                 <input
                   name="enforce-key"
                   type="checkbox"
-                  value={enforceKey}
+                  defaultChecked={enforceKey}
                   onChange={(e) => setStorageValue(setEnforceKey, "enforceKey")(e.target.checked)}
                 />
               </div>

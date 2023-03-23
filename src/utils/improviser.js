@@ -198,7 +198,7 @@ export default class Improviser {
     return (pitch) => pitch + table[(pitch + 12) % 12];
   }
 
-  async generate(maxNotes = 100, tempo = 90, key = "C", scale = "major", choiceReinforcement = 0.0, enforceKey = true) {
+  async generate(maxNotes = 100, tempo = 90, key = "C", scale = "major", choiceReinforcement = 0.0, enforceKey = false) {
     /* intialize midi */
     var midi = new Midi();
     const pitchQuantizer = enforceKey && this.getPitchQuantizer(key, scale);
@@ -225,6 +225,7 @@ export default class Improviser {
     const chordSizes = {};
     let maxChordSize = 0;
     let chordSize = 0;
+    let numNotes = 0;
 
     /* This function will be called with every new Markov prediction */
     const stateToMidiNote = (state) => {
@@ -245,7 +246,7 @@ export default class Improviser {
         maxChordSize = Math.max(chordSize, maxChordSize);
         chordSize = 0;
       }
-
+      numNotes++;
       ticks += deltaTicks;
     };
 
@@ -256,11 +257,11 @@ export default class Improviser {
     return midi;
   }
 
-  async generateBase(maxNotes = 100, tempo = 90, key = "C", scale = "major", choiceReinforcement = 0.0, enforceKey = true) {
+  async generateRecursively(maxNotes = 100, tempo = 90, key = "C", scale = "major", choiceReinforcement = 0.0, enforceKey = false) {
     let midi;
     for (let i = 0; i < this.getMemory(); i++) {
       const improv = new Improviser(i + 1);
-      const extraNotes = Math.floor(maxNotes * (1 - i / Math.max(1, this.getMemory() - 1)));
+      const extraNotes = maxNotes * (this.getMemory() - i - 1);
       if (i === 0) {
         improv.markov.transitionTable = this.markov.transitionTable;
         improv.markov.stateWeights = this.markov.stateWeights;
