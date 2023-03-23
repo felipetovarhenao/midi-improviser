@@ -15,6 +15,10 @@ export default function FileUploader() {
     }
     const newFiles = {};
     midiFiles.forEach((file) => {
+      /* skip non midi files */
+      if (!file.name.endsWith(".mid") && !file.name.endsWith(".midi")) {
+        return;
+      }
       if (files[file.name] === undefined) {
         newFiles[file.name] = { file: file, selected: true };
       }

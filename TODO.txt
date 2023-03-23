@@ -2,5 +2,4 @@
 - Use initial states for each file
 - Allow regeneration if shorter than desired, or at least resetting to fulfill duration
 - Add safeguards against:
-	- Non-midi files.
 	- Against generating empty sequences
