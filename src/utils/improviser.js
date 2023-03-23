@@ -264,8 +264,8 @@ export default class Improviser {
     for (let i = 0; i < this.getMemory(); i++) {
       const improv = new Improviser(i + 1);
       if (i === 0) {
-        improv.markov.transitionTable = this.markov.transitionTable;
-        improv.markov.stateWeights = this.markov.stateWeights;
+        improv.markov.transitionTable = JSON.parse(JSON.stringify(this.markov.transitionTable));
+        improv.markov.stateWeights = JSON.parse(JSON.stringify(this.markov.stateWeights));
       } else {
         await improv.train([midi]);
       }
