@@ -1,6 +1,11 @@
 import Chance from "chance";
 
 export default class MarkovModel {
+  /**
+   * A markov model takes a sequential data, and creates a probabilistic model of how likely given state
+   * is to transition to another state.
+   * @param {Number} order The n-gram or number of elements in the data to be considered as a single state.
+   */
   constructor(order = 1) {
     this.order = order;
     this.transitionTable = {};
@@ -58,7 +63,7 @@ export default class MarkovModel {
     return JSON.parse(JSON.stringify(this.transitionTable));
   }
 
-  run(numIter = 100, lambda = false, choiceReinforcement = 0.0) {
+  run(numIter = 100, lambda = false, choiceReinforcement = 0.0, allowReset = true) {
     const matrix = this.getTransitionTableCopy();
     let current = this.choose(this.stateWeights);
 
@@ -73,7 +78,12 @@ export default class MarkovModel {
 
       /*  stop generating if not states are found */
       if (!numStates) {
-        break;
+        if (!allowReset) {
+          break;
+        }
+        current = this.choose(this.stateWeights);
+        i -= 1;
+        continue;
       }
 
       /* make prediction */

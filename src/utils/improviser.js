@@ -239,7 +239,7 @@ export default class Improviser {
 
       chordSize++;
 
-      /* if a new chord is next, add chord size information to array and reset chord size */
+      /* if the next note start a new chord (i.e., has a different onset), add chord size information to array and reset chord size */
       if (deltaTicks > 0) {
         chordSizes[ticks] = chordSize;
         maxChordSize = Math.max(chordSize, maxChordSize);

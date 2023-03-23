@@ -122,8 +122,8 @@ export default function Improviser() {
             <label htmlFor="memory">
               Memory{" "}
               <HelpBox>
-                <i>Memory</i> controls the amount of contextual information the improviser learns from the MIDI files. A higher memory value results
-                in music that more closely resembles the selected MIDI files.
+                Amount of contextual information the improviser considers to generate music. A higher memory value will increase the consistency and
+                predictability of the improvisation.
               </HelpBox>
             </label>
             <Slider
@@ -146,8 +146,8 @@ export default function Improviser() {
           </ButtonPanel>
           <div className="generate-form">
             <label htmlFor="num-notes">
-              Max. number of notes
-              <HelpBox>Maximum number of notes to be generated.</HelpBox>
+              Number of notes
+              <HelpBox>Number of notes to be generated.</HelpBox>
             </label>
             <Slider
               name={"num-notes"}
@@ -161,7 +161,7 @@ export default function Improviser() {
             />
             <label htmlFor="tempo">
               Tempo
-              <HelpBox>Desired tempo in beats per minute (BPM)</HelpBox>
+              <HelpBox>Desired tempo in beats per minute (BPM).</HelpBox>
             </label>
             <Slider name={"tempo"} value={tempo} inMin={10} inMax={640} outMin={10} outMax={640} setValue={setStorageValue(setTempo, "tempo")} />
             <label htmlFor="reinforcement-slider">
@@ -171,8 +171,6 @@ export default function Improviser() {
                   Degree to which the improviser can update its musical knowledge during the improvisation, encouraging the repetition of previously
                   made choices.
                 </p>
-                <br />
-                <p>A higher value increases the chances of generating more cohesive/predictable music.</p>
               </HelpBox>
             </label>
             <Slider

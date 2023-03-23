@@ -3,6 +3,12 @@
 .AppHeader {
   .header {
     @include v-pad($gap-lg);
+    .icon {
+      @include r-pad($gap-lg);
+      @include b-pad;
+      font-size: 70px;
+      vertical-align: middle;
+    }
     .logo {
       @include h-center;
       justify-content: center;
@@ -13,11 +19,5 @@
       font-size: $txt-xl;
       text-align: center;
     }
-  }
-  .icon {
-    @include r-pad($gap-lg);
-    @include b-pad;
-    font-size: 70px;
-    vertical-align: middle;
   }
 }
