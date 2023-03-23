@@ -12,6 +12,12 @@
         & > * {
           @include v-pad;
         }
+        .form-subsection {
+          @include t-mar;
+          text-transform: uppercase;
+          font-size: $txt-sm;
+          color: var(--txt2);
+        }
       }
       input[type="number"] {
         @include pad;

@@ -9,16 +9,21 @@ export default function FileUploader() {
   const [numSelected, setNumSelected] = useState(0);
 
   function appendFiles() {
-    const midiFiles = Array.from(document.getElementById("midi").files);
+    const inputElement = document.getElementById("midi");
+    const midiFiles = Array.from(inputElement.files);
+    inputElement.value = "";
+
     if (!midiFiles.length) {
       return;
     }
+
     const newFiles = {};
     midiFiles.forEach((file) => {
       /* skip non midi files */
       if (!file.name.endsWith(".mid") && !file.name.endsWith(".midi")) {
         return;
       }
+      /* add file if not already in menu */
       if (files[file.name] === undefined) {
         newFiles[file.name] = { file: file, selected: true };
       }

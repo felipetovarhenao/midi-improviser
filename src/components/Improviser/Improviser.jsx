@@ -52,7 +52,7 @@ export default function Improviser() {
   const [numNotes, setNumNotes] = useState(getStorageValue("numNotes") || 500);
   const [tempo, setTempo] = useState(getStorageValue("tempo") || 90);
   const [markovOrder, setMarkovOrder] = useState(getStorageValue("markovOrder") || 5);
-  const [freedom, setFreedom] = useState(getStorageValue("freedom") || 3);
+  const [creativity, setCreativity] = useState(getStorageValue("creativity") || 3);
   const [keySignature, setKeySignature] = useState(getStorageValue("keySignature") || "C");
   const [keyMode, setKeyMode] = useState(getStorageValue("keyMode") || "major");
   const [reinforcementFactor, setReinforcementFactor] = useState(getStorageValue("reinforcementFactor") || 90);
@@ -64,7 +64,7 @@ export default function Improviser() {
     setStatus(`training improviser...`);
     const midiFiles = filesToMidi(selectedFiles);
 
-    const predictability = 4 - Number(freedom);
+    const predictability = 4 - Number(creativity);
     if (improviser.getPredictability() !== predictability) {
       improviser.setPredictability(predictability);
     }
@@ -117,18 +117,18 @@ export default function Improviser() {
       <div className="form-container">
         <form className="form" onSubmit={(e) => e.preventDefault()}>
           <div className="train-form">
-            <label htmlFor="freedom">
-              Freedom <HelpBox>How much the improviser is able to deviate from the original music.</HelpBox>
+            <label htmlFor="creativity">
+              Creativity <HelpBox>How much the improviser is able to deviate from the original music.</HelpBox>
             </label>
             <Slider
-              name={"freedom"}
-              value={freedom}
+              name={"creativity"}
+              value={creativity}
               inMin={1}
               inMax={3}
               outMin={1}
               outMax={3}
               setValue={(value) => {
-                setStorageValue(setFreedom, "freedom")(value);
+                setStorageValue(setCreativity, "creativity")(value);
                 setIsTrained(false);
               }}
             />
@@ -139,6 +139,8 @@ export default function Improviser() {
             </button>
           </ButtonPanel>
           <div className="generate-form">
+            <div className="form-subsection">Behavior</div>
+            <div></div>
             <label htmlFor="memory">
               Memory{" "}
               <HelpBox>
@@ -171,6 +173,8 @@ export default function Improviser() {
               value={reinforcementFactor}
               setValue={setStorageValue(setReinforcementFactor, "reinforcementFactor")}
             />
+            <div className="form-subsection">Output</div>
+            <div></div>
             <label htmlFor="num-notes">
               Number of notes
               <HelpBox>Number of notes to be generated.</HelpBox>
