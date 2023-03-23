@@ -152,6 +152,8 @@ export default class Improviser {
       /* lastDelta refers to the inter-onset duration 
       between the current note and the last chord */
       let lastDelta = 0;
+      let currentChord = [];
+      let currentChordIndices = [];
 
       for (let n = 0; n < notes.length - 1; n++) {
         /* get note */
@@ -166,11 +168,24 @@ export default class Improviser {
         /* quantize deltas and durations */
         const deltaTicks = this.getNearestDuration(nextStart - start);
 
+        /* since all tracks are merged, avoid unisons */
+        if (deltaTicks === 0 && currentChord.includes(pitch)) {
+          continue;
+        }
+
+        /* include in array for future reference */
+        currentChord.push(pitch);
+        const eventID = sequence.length;
+        currentChordIndices.push(eventID);
+
         /* add note to sequence */
-        sequence.push([pitch, deltaTicks, lastDelta]);
+        sequence.push([pitch, deltaTicks, lastDelta, deltaTicks]);
 
         if (deltaTicks > 0) {
+          currentChordIndices.forEach((i) => (sequence[i][3] = deltaTicks));
           lastDelta = deltaTicks;
+          currentChord = [];
+          currentChordIndices = [];
         }
       }
     }
@@ -285,7 +300,7 @@ export default class Improviser {
 
   chordSizeToVelocity(time, chordSizes, maxChordSize) {
     /* returns a normalized velocity value based on chord size */
-    return ((chordSizes[time] || maxChordSize / 2) / maxChordSize) * 0.3 + 0.5;
+    return ((chordSizes[time] || maxChordSize / 2) / maxChordSize) * 0.5 + 0.3;
   }
 
   pitchToVelocity(pitch, velRange = 0.125) {
@@ -316,7 +331,7 @@ export default class Improviser {
           const legatoDuration = note.ticks - currentOnset;
 
           /* get velocity based on chord size and smoothen based on previous velocity */
-          vel = this.chordSizeToVelocity(currentOnset, chordSizes, maxChordSize) * 0.8 + vel * 0.2;
+          vel = this.chordSizeToVelocity(currentOnset, chordSizes, maxChordSize) * 0.5 + vel * 0.5;
 
           /* to every note, apply legato duration and assign velocity value based on context */
           currentChord.forEach((note) => {
