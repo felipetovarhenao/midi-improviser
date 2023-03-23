@@ -331,7 +331,7 @@ export default class Improviser {
           const legatoDuration = note.ticks - currentOnset;
 
           /* get velocity based on chord size and smoothen based on previous velocity */
-          vel = this.chordSizeToVelocity(currentOnset, chordSizes, maxChordSize) * 0.5 + vel * 0.5;
+          vel = vel * 0.75 + this.chordSizeToVelocity(currentOnset, chordSizes, maxChordSize) * 0.25;
 
           /* to every note, apply legato duration and assign velocity value based on context */
           currentChord.forEach((note) => {
