@@ -285,7 +285,7 @@ export default class Improviser {
 
   chordSizeToVelocity(time, chordSizes, maxChordSize) {
     /* returns a normalized velocity value based on chord size */
-    return ((chordSizes[time] || maxChordSize / 2) / maxChordSize) * 0.25 + 0.65;
+    return ((chordSizes[time] || maxChordSize / 2) / maxChordSize) * 0.3 + 0.5;
   }
 
   pitchToVelocity(pitch, velRange = 0.125) {
