@@ -26,9 +26,10 @@ export default class Improviser {
     B: 11,
   };
 
-  constructor(memory = 2) {
+  constructor(memory = 2, predictability = 1) {
     this.markov = new MarkovModel(memory);
     this.PPQ = 480;
+    this.predictability = predictability;
     this.maxSubdivisions = [16, 20, 24];
     this.forbiddenNumerators = [7, 11, 13, 15, 17, 19, 21, 22, 23, 24];
     this.allowedDurations = this.getAllowedDurations();
@@ -44,6 +45,14 @@ export default class Improviser {
 
   getMemory() {
     return this.markov.order;
+  }
+
+  setPredictability(val) {
+    this.predictability = val;
+  }
+
+  getPredictability() {
+    return this.predictability;
   }
 
   setMemory(num, reset = true) {
@@ -176,7 +185,7 @@ export default class Improviser {
 
   async trainBase(files) {
     const order = this.getMemory();
-    this.setMemory(1);
+    this.setMemory(this.predictability);
     await this.train(files);
     this.setMemory(order, false);
   }
@@ -262,7 +271,7 @@ export default class Improviser {
   async generateRecursively(maxNotes = 100, tempo = 90, key = "C", scale = "major", choiceReinforcement = 0.0, enforceKey = false) {
     let midi;
     for (let i = 0; i < this.getMemory(); i++) {
-      const improv = new Improviser(i + 1);
+      const improv = new Improviser(i + this.predictability);
       if (i === 0) {
         improv.markov.transitionTable = JSON.parse(JSON.stringify(this.markov.transitionTable));
         improv.markov.stateWeights = JSON.parse(JSON.stringify(this.markov.stateWeights));

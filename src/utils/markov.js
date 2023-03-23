@@ -9,7 +9,6 @@ export default class MarkovModel {
   constructor(order = 1) {
     this.order = order;
     this.transitionTable = {};
-    this.numStates = 0;
     this.stateWeights = {};
     this.chance = new Chance();
     this.maxReinforcement = 2 / 3;
@@ -17,7 +16,6 @@ export default class MarkovModel {
 
   reset() {
     this.transitionTable = {};
-    this.numStates = 0;
     this.stateWeights = {};
   }
 
@@ -38,7 +36,6 @@ export default class MarkovModel {
       if (this.transitionTable[state] === undefined) {
         this.transitionTable[state] = {};
         this.stateWeights[state] = 0;
-        this.numStates++;
       }
 
       if (prevState) {

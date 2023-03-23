@@ -52,6 +52,7 @@ export default function Improviser() {
   const [numNotes, setNumNotes] = useState(getStorageValue("numNotes") || 500);
   const [tempo, setTempo] = useState(getStorageValue("tempo") || 90);
   const [markovOrder, setMarkovOrder] = useState(getStorageValue("markovOrder") || 5);
+  const [freedom, setFreedom] = useState(getStorageValue("freedom") || 3);
   const [keySignature, setKeySignature] = useState(getStorageValue("keySignature") || "C");
   const [keyMode, setKeyMode] = useState(getStorageValue("keyMode") || "major");
   const [reinforcementFactor, setReinforcementFactor] = useState(getStorageValue("reinforcementFactor") || 90);
@@ -59,13 +60,14 @@ export default function Improviser() {
 
   async function train() {
     /* convert String to Number */
-    const memory = Number(markovOrder);
-    if (improviser.getMemory() !== memory) {
-      improviser.setMemory(memory);
-    }
     setIsTrained(false);
-    setStatus(`training improviser (memory size: ${markovOrder})...`);
+    setStatus(`training improviser...`);
     const midiFiles = filesToMidi(selectedFiles);
+
+    const predictability = 4 - Number(freedom);
+    if (improviser.getPredictability() !== predictability) {
+      improviser.setPredictability(predictability);
+    }
 
     await improviser.trainBase(midiFiles);
 
@@ -77,6 +79,11 @@ export default function Improviser() {
   async function generate() {
     setDownloadURL(false);
     setStatus("generating MIDI...");
+
+    const memory = Number(markovOrder);
+    if (improviser.getMemory() !== memory) {
+      improviser.setMemory(memory, false);
+    }
     const bufferArray = await improviser.generateRecursively(
       Number(numNotes),
       Number(tempo),
@@ -110,6 +117,28 @@ export default function Improviser() {
       <div className="form-container">
         <form className="form" onSubmit={(e) => e.preventDefault()}>
           <div className="train-form">
+            <label htmlFor="freedom">
+              Freedom <HelpBox>How much the improviser is able to deviate from the original music.</HelpBox>
+            </label>
+            <Slider
+              name={"freedom"}
+              value={freedom}
+              inMin={1}
+              inMax={3}
+              outMin={1}
+              outMax={3}
+              setValue={(value) => {
+                setStorageValue(setFreedom, "freedom")(value);
+                setIsTrained(false);
+              }}
+            />
+          </div>
+          <ButtonPanel>
+            <button onClick={train} disabled={!selectedFiles.length}>
+              Train
+            </button>
+          </ButtonPanel>
+          <div className="generate-form">
             <label htmlFor="memory">
               Memory{" "}
               <HelpBox>
@@ -126,16 +155,22 @@ export default function Improviser() {
               outMax={9}
               setValue={(value) => {
                 setStorageValue(setMarkovOrder, "markovOrder")(value);
-                setIsTrained(false);
               }}
             />
-          </div>
-          <ButtonPanel>
-            <button onClick={train} disabled={!selectedFiles.length}>
-              Train
-            </button>
-          </ButtonPanel>
-          <div className="generate-form">
+            <label htmlFor="reinforcement-slider">
+              Choice reinforcement
+              <HelpBox>
+                <p>
+                  Degree to which the improviser can update its musical knowledge during the improvisation, encouraging the repetition of previously
+                  made choices.
+                </p>
+              </HelpBox>
+            </label>
+            <Slider
+              name={"reinforcement-slider"}
+              value={reinforcementFactor}
+              setValue={setStorageValue(setReinforcementFactor, "reinforcementFactor")}
+            />
             <label htmlFor="num-notes">
               Number of notes
               <HelpBox>Number of notes to be generated.</HelpBox>
@@ -155,20 +190,6 @@ export default function Improviser() {
               <HelpBox>Desired tempo in beats per minute (BPM).</HelpBox>
             </label>
             <Slider name={"tempo"} value={tempo} inMin={40} inMax={208} outMin={40} outMax={208} setValue={setStorageValue(setTempo, "tempo")} />
-            <label htmlFor="reinforcement-slider">
-              Choice reinforcement
-              <HelpBox>
-                <p>
-                  Degree to which the improviser can update its musical knowledge during the improvisation, encouraging the repetition of previously
-                  made choices.
-                </p>
-              </HelpBox>
-            </label>
-            <Slider
-              name={"reinforcement-slider"}
-              value={reinforcementFactor}
-              setValue={setStorageValue(setReinforcementFactor, "reinforcementFactor")}
-            />
             <label htmlFor="keySignature">
               Key signature
               <HelpBox>

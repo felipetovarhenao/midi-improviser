@@ -1,1 +1,3 @@
 - allow instrument keeping option
+
+- Turn improviser as subclass of markov to avoid resetting confussions
