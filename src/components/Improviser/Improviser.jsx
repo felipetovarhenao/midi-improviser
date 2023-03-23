@@ -55,7 +55,7 @@ export default function Improviser() {
   const [keySignature, setKeySignature] = useState(getStorageValue("keySignature") || "C");
   const [keyMode, setKeyMode] = useState(getStorageValue("keyMode") || "major");
   const [reinforcementFactor, setReinforcementFactor] = useState(getStorageValue("reinforcementFactor") || 90);
-  const [enforceKey, setEnforceKey] = useState(getStorageValue("enforceKey") || false);
+  const [enforceKey, setEnforceKey] = useState(getStorageValue("enforceKey") === true);
 
   async function train() {
     /* convert String to Number */
@@ -93,18 +93,8 @@ export default function Improviser() {
   }
 
   function makeFileName() {
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    let mm = today.getMonth() + 1;
-    let dd = today.getDate();
-
-    if (dd < 10) dd = "0" + dd;
-    if (mm < 10) mm = "0" + mm;
-
-    const date = dd + "-" + mm + "-" + yyyy;
-    const mem = improviser.markov.order;
-
-    return `improv (${numNotes} notes in ${keySignature}${keyMode === "major" ? "M" : "m"} @ ${tempo}BPM with memory size of ${mem} on ${date}).mid`;
+    const mem = improviser.getMemory();
+    return `improv (${numNotes} notes in ${keySignature}${keyMode === "major" ? "M" : "m"} @ ${tempo}BPM with memory size of ${mem}).mid`;
   }
 
   useEffect(() => {
@@ -131,9 +121,9 @@ export default function Improviser() {
               name={"memory"}
               value={markovOrder}
               inMin={1}
-              inMax={10}
+              inMax={9}
               outMin={1}
-              outMax={10}
+              outMax={9}
               setValue={(value) => {
                 setStorageValue(setMarkovOrder, "markovOrder")(value);
                 setIsTrained(false);
@@ -153,18 +143,18 @@ export default function Improviser() {
             <Slider
               name={"num-notes"}
               value={numNotes}
-              inMin={10}
-              inMax={5000}
-              outMin={10}
-              outMax={5000}
-              step={10}
+              inMin={50}
+              inMax={3000}
+              outMin={50}
+              outMax={3000}
+              step={50}
               setValue={setStorageValue(setNumNotes, "numNotes")}
             />
             <label htmlFor="tempo">
               Tempo
               <HelpBox>Desired tempo in beats per minute (BPM).</HelpBox>
             </label>
-            <Slider name={"tempo"} value={tempo} inMin={10} inMax={640} outMin={10} outMax={640} setValue={setStorageValue(setTempo, "tempo")} />
+            <Slider name={"tempo"} value={tempo} inMin={40} inMax={208} outMin={40} outMax={208} setValue={setStorageValue(setTempo, "tempo")} />
             <label htmlFor="reinforcement-slider">
               Choice reinforcement
               <HelpBox>

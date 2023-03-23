@@ -65,7 +65,7 @@ export default class Improviser {
     const midiVal = this.pitchToMidi(key);
     const target = scale == "major" ? 0 : -3;
     const a = target - midiVal;
-    const b = a + 12;
+    const b = (a + 12) % 12;
     return Math.abs(a) < Math.abs(b) ? a : b;
   }
 
@@ -113,6 +113,7 @@ export default class Improviser {
       const notes = [];
       const keySignature = midi.header.keySignatures[0];
       const transp = this.getTranspositionInterval(keySignature?.key, keySignature?.scale);
+
       for (let t = 0; t < midi.tracks.length; t++) {
         /* get midi track */
         const track = midi.tracks[t];
@@ -188,7 +189,8 @@ export default class Improviser {
         : // pitch shifting per pitch class in minor scale
           [0, -1, 0, -1, 0, 0, -1, 0, 0, 0, 1, 0];
 
-    const transp = -this.getTranspositionInterval(key, scale);
+    const transp = this.getTranspositionInterval(key, scale);
+
     const table = {};
     for (let i = 0; i < pitchDeltas.length; i++) {
       const id = (i + transp + 12) % 12;
@@ -261,14 +263,13 @@ export default class Improviser {
     let midi;
     for (let i = 0; i < this.getMemory(); i++) {
       const improv = new Improviser(i + 1);
-      const extraNotes = maxNotes * (this.getMemory() - i - 1);
       if (i === 0) {
         improv.markov.transitionTable = this.markov.transitionTable;
         improv.markov.stateWeights = this.markov.stateWeights;
       } else {
         await improv.train([midi]);
       }
-      midi = await improv.generate(maxNotes + extraNotes, tempo, key, scale, choiceReinforcement, enforceKey);
+      midi = await improv.generate(maxNotes, tempo, key, scale, choiceReinforcement, enforceKey);
     }
     return midi.toArray();
   }
