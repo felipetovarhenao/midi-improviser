@@ -20,7 +20,8 @@ export default function FileUploader() {
     const newFiles = {};
     midiFiles.forEach((file) => {
       /* skip non midi files */
-      if (!file.name.endsWith(".mid") && !file.name.endsWith(".midi")) {
+      const fname = file.name.toLowerCase();
+      if (!fname.endsWith(".mid") && !fname.endsWith(".midi")) {
         return;
       }
       /* add file if not already in menu */
