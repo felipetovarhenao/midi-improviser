@@ -4,6 +4,7 @@ import samp48 from "../assets/sounds/48.mp3";
 import samp60 from "../assets/sounds/60.mp3";
 import samp72 from "../assets/sounds/72.mp3";
 import samp96 from "../assets/sounds/96.mp3";
+import Improviser from "./improviser";
 
 export default class Player {
   constructor() {
@@ -27,7 +28,7 @@ export default class Player {
     this.context = new (window.AudioContext || window.webkitAudioContext || window.mozAudioContext || window.oAudioContext)();
     this.now = () => this.context.currentTime;
     this.dac = () => this.context.destination;
-    this.envelope = [0, 0.707, 1, 0.707, 0];
+    this.envelope = [1, 1, 1, 1, 1, 0.707, 0];
     this.masterGain = this.context.createGain();
     this.masterGain.connect(this.dac());
     this.buffers = {};
@@ -75,14 +76,13 @@ export default class Player {
     return [this.buffers[bufferIndex], playbackRate];
   }
 
-  playNote(pitch) {
-    const now = this.now();
+  playNote(pitch, time = 0) {
+    const now = time || this.now();
     const sample = this.context.createBufferSource();
     const [buffer, playbackRate] = this.getPitchBuffer(pitch);
 
     sample.buffer = buffer;
     sample.playbackRate.value = playbackRate;
-    console.log(buffer);
 
     const noteDur = 2.0;
 
@@ -109,51 +109,13 @@ export default class Player {
     this.buffer = buffer;
   }
 
-  playGrain(dur, inskip = 0.0, pan = 0.0, amp = 1.0, playRate = 1.0, reverbMix = 0.0, garbageCollect = true) {
-    const now = this.now();
-    const grain = this.context.createBufferSource();
-    grain.buffer = this.buffer;
-    grain.playbackRate.value = playRate;
-
-    const grainDur = Math.min(dur, Math.max(0.001, grain.buffer.duration - inskip));
-    const grainInskip = Math.max(0, Math.min(inskip, grain.buffer.duration - grainDur));
-
-    const grainEnv = this.context.createGain();
-    grainEnv.gain.setValueAtTime(amp, now);
-
-    const gain = this.context.createGain();
-    const envDuration = grainDur * (1 / playRate);
-    gain.gain.setValueAtTime(0.0, now);
-    gain.gain.setValueCurveAtTime(this.envelope, now + 0.001, envDuration * 0.99);
-
-    const dryMix = this.context.createGain();
-    dryMix.gain.setValueAtTime(1.0 - reverbMix, now);
-    dryMix.connect(this.masterGain);
-
-    const panner = this.context.createStereoPanner();
-    panner.pan.value = pan;
-
-    grain.connect(grainEnv);
-    grainEnv.connect(gain);
-    gain.connect(panner);
-    panner.connect(dryMix);
-
-    const wetMix = this.context.createGain();
-    wetMix.gain.setValueAtTime(reverbMix, now);
-    panner.connect(wetMix);
-    wetMix.connect(this.reverb);
-
-    grain.start(now, grainInskip, grainDur);
-    if (garbageCollect) {
-      grain.stop(now + envDuration + 0.1);
-      setTimeout(() => {
-        grain.disconnect();
-        grainEnv.disconnect();
-        gain.disconnect();
-        panner.disconnect();
-        dryMix.disconnect();
-        wetMix.disconnect();
-      }, (envDuration + 0.15) * 1000);
+  playMidi(midi) {
+    const notes = [];
+    for (let i = 0; i < midi.tracks.length; i++) {
+      const trackNotes = midi.tracks[i].notes;
+      for (let j = 0; j < trackNotes.length; j++) {
+        notes.push();
+      }
     }
   }
 }

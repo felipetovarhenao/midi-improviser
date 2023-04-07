@@ -31,7 +31,7 @@ export default class Improviser {
     this.PPQ = 480;
     this.predictability = predictability;
     this.maxSubdivisions = [16, 20, 24];
-    this.forbiddenNumerators = [7, 11, 13, 15, 17, 19, 21, 22, 23, 24];
+    this.forbiddenNumerators = [7, 11, 13, 14, 15, 17, 19, 21, 22, 23, 24];
     this.allowedDurations = this.getAllowedDurations();
   }
 

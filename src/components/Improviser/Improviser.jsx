@@ -2,6 +2,7 @@ import "./Improviser.scss";
 
 import { useContext, useEffect, useState } from "react";
 import { ImproviserContext } from "./ImproviserProvider";
+import { PlayerContext } from "../PlayerProvider/PlayerProvider";
 import { FileUploaderContext } from "../FileUploader/FileUploaderProvider";
 
 import classNames from "classnames";
@@ -42,6 +43,7 @@ function filesToMidi(files) {
 
 export default function Improviser() {
   const { improviser } = useContext(ImproviserContext);
+  const { player } = useContext(PlayerContext);
   const { files } = useContext(FileUploaderContext);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [downloadURL, setDownloadURL] = useState(false);
@@ -109,6 +111,12 @@ export default function Improviser() {
     Object.keys(files).forEach((name) => files[name].selected && sel.push(files[name].file));
     setSelectedFiles(sel);
   }, [files]);
+
+  async function playMidi() {
+    const midi = await Midi.fromUrl(downloadURL);
+    console.log(midi);
+    player.playMidi(midi);
+  }
 
   return (
     <div className="Improviser">
@@ -253,6 +261,9 @@ export default function Improviser() {
               }}
             >
               Download
+            </button>
+            <button className={classNames({ disabled: !downloadURL })} onClick={playMidi}>
+              Play
             </button>
           </ButtonPanel>
         </form>
