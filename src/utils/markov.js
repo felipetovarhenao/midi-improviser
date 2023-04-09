@@ -11,7 +11,7 @@ export default class MarkovModel {
     this.transitionTable = {};
     this.stateWeights = {};
     this.chance = new Chance();
-    this.maxReinforcement = 2 / 3;
+    this.maxReinforcement = 3 / 4;
   }
 
   reset() {
@@ -50,9 +50,13 @@ export default class MarkovModel {
     }
   }
 
-  choose(transitions) {
+  choose(transitions, epsilon) {
     const states = Object.keys(transitions);
-    const weights = Object.values(transitions);
+    let weights = Object.values(transitions);
+
+    if (Math.random() < epsilon) {
+      return states[Math.floor(Math.random() * states.length)];
+    }
     return this.chance.weighted(states, weights);
   }
 
@@ -60,7 +64,7 @@ export default class MarkovModel {
     return JSON.parse(JSON.stringify(this.transitionTable));
   }
 
-  run(numIter = 100, lambda = false, choiceReinforcement = 0.0, allowReset = true) {
+  run(numIter = 100, lambda = false, choiceReinforcement = 0.0, allowReset = true, epsilon = 0.0, decayRate = 0.99) {
     const matrix = this.getTransitionTableCopy();
     let current = this.choose(this.stateWeights);
 
@@ -78,14 +82,15 @@ export default class MarkovModel {
         if (!allowReset) {
           break;
         }
-        current = this.choose(this.stateWeights);
+        current = this.choose(this.stateWeights, epsilon);
         i -= 1;
         continue;
       }
 
       /* make prediction */
-      const nextState = this.choose(transitions);
+      const nextState = this.choose(transitions, epsilon);
       const prediction = JSON.parse(current)[0];
+      epsilon *= decayRate;
 
       /* 
       Choice reinforcement consists of allowing the transition probability matrix to be updated
@@ -101,7 +106,11 @@ export default class MarkovModel {
 
         /* increase probability if below threshold */
         if (probRatio < this.maxReinforcement) {
-          matrix[current][nextState] += (numStates - 1) * choiceReinforcement;
+          const newValue = matrix[current][nextState] * 2 ** choiceReinforcement;
+          const maxValue = (this.maxReinforcement * (sum - matrix[current][nextState])) / (1 - this.maxReinforcement);
+
+          /* increase, but not more than allowed */
+          matrix[current][nextState] = Math.min(newValue, maxValue);
         }
       }
 

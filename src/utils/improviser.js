@@ -224,7 +224,16 @@ export default class Improviser {
     return (pitch) => pitch + table[(pitch + 12) % 12];
   }
 
-  async generate(maxNotes = 100, tempo = 90, key = "C", scale = "major", choiceReinforcement = 0.0, enforceKey = false) {
+  async generate(
+    maxNotes = 100,
+    tempo = 90,
+    key = "C",
+    scale = "major",
+    choiceReinforcement = 0.0,
+    enforceKey = false,
+    epsilon = 0.9,
+    decayRate = 0.99
+  ) {
     /* intialize midi */
     var midi = new Midi();
     const pitchQuantizer = enforceKey && this.getPitchQuantizer(key, scale);
@@ -278,22 +287,35 @@ export default class Improviser {
 
     /* bind callback to instance */
     stateToMidiNote.bind(this);
-    this.markov.run(maxNotes, stateToMidiNote, choiceReinforcement);
+    this.markov.run(maxNotes, stateToMidiNote, choiceReinforcement, true, epsilon, decayRate);
     midi = this.cleanMidi(midi, chordSizes, maxChordSize);
     return midi;
   }
 
-  async generateRecursively(maxNotes = 100, tempo = 90, key = "C", scale = "major", choiceReinforcement = 0.0, enforceKey = false) {
+  async generateRecursively(
+    maxNotes = 100,
+    tempo = 90,
+    key = "C",
+    scale = "major",
+    choiceReinforcement = 0.0,
+    enforceKey = false,
+    initialEpsilon = 0.9,
+    decayRate = 0.99
+  ) {
     let midi;
-    for (let i = 0; i < this.getMemory(); i++) {
+    const maxIters = this.getMemory();
+    for (let i = 0; i < maxIters; i++) {
       const improv = new Improviser(i + this.predictability);
+      const decr = 1 - i / Math.max(1, maxIters - 1);
+      const epsilon = decr * initialEpsilon;
+      const reinforcement = choiceReinforcement * decr;
       if (i === 0) {
         improv.markov.transitionTable = JSON.parse(JSON.stringify(this.markov.transitionTable));
         improv.markov.stateWeights = JSON.parse(JSON.stringify(this.markov.stateWeights));
       } else {
         await improv.train([midi]);
       }
-      midi = await improv.generate(maxNotes, tempo, key, scale, choiceReinforcement, enforceKey);
+      midi = await improv.generate(maxNotes, tempo, key, scale, reinforcement, enforceKey, epsilon, decayRate);
     }
     return midi.toArray();
   }
