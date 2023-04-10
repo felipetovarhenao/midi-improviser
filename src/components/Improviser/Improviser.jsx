@@ -1,16 +1,16 @@
 import "./Improviser.scss";
 
 import { useContext, useEffect, useState } from "react";
+import classNames from "classnames";
+import { Midi } from "@tonejs/midi";
+
 import { ImproviserContext } from "./ImproviserProvider";
 import { FileUploaderContext } from "../FileUploader/FileUploaderProvider";
-
-import classNames from "classnames";
 import Slider from "../Slider/Slider";
-
 import HelpBox from "../HelpBox/HelpBox";
 import ButtonPanel from "../ButtonPanel/ButtonPanel";
 
-import { Midi } from "@tonejs/midi";
+const MAX_PREDICTABILITY = 3;
 
 function setStorageValue(setValue, key) {
   return (value) => {
@@ -52,7 +52,7 @@ export default function Improviser() {
   const [numNotes, setNumNotes] = useState(getStorageValue("numNotes") || 500);
   const [tempo, setTempo] = useState(getStorageValue("tempo") || 90);
   const [markovOrder, setMarkovOrder] = useState(getStorageValue("markovOrder") || 5);
-  const [creativity, setCreativity] = useState(getStorageValue("creativity") || 3);
+  const [creativity, setCreativity] = useState(getStorageValue("creativity") || MAX_PREDICTABILITY);
   const [keySignature, setKeySignature] = useState(getStorageValue("keySignature") || "C");
   const [keyMode, setKeyMode] = useState(getStorageValue("keyMode") || "major");
   const [reinforcementFactor, setReinforcementFactor] = useState(getStorageValue("reinforcementFactor") || 90);
@@ -64,7 +64,7 @@ export default function Improviser() {
     setStatus(`training improviser...`);
     const midiFiles = filesToMidi(selectedFiles);
 
-    const predictability = 4 - Number(creativity);
+    const predictability = MAX_PREDICTABILITY + 1 - Number(creativity);
     if (improviser.getPredictability() !== predictability) {
       improviser.setPredictability(predictability);
     }
@@ -124,9 +124,9 @@ export default function Improviser() {
               name={"creativity"}
               value={creativity}
               inMin={1}
-              inMax={3}
+              inMax={MAX_PREDICTABILITY}
               outMin={1}
-              outMax={3}
+              outMax={MAX_PREDICTABILITY}
               setValue={(value) => {
                 setStorageValue(setCreativity, "creativity")(value);
                 setIsTrained(false);
