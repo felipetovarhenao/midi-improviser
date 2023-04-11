@@ -101,7 +101,11 @@ export default class MarkovModel {
 
         /* increase probability if below threshold */
         if (probRatio < this.maxReinforcement) {
-          matrix[current][nextState] += (numStates - 1) * choiceReinforcement;
+          const newValue = matrix[current][nextState] * 2 ** choiceReinforcement;
+          const maxValue = (this.maxReinforcement * (sum - matrix[current][nextState])) / (1 - this.maxReinforcement);
+
+          /* increase, but not more than allowed */
+          matrix[current][nextState] = Math.min(newValue, maxValue);
         }
       }
 
